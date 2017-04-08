@@ -1,0 +1,20 @@
+.clearfix() {
+  &:before,
+  &:after {
+    display: block;
+    content: '';
+    height: 0;
+    visibility: hidden;
+  }
+  &:after {
+    clear: both;
+  }
+}
+
+.fontsize(@count,@i:11) when (@i =< @count) {
+  @size: @i + 1;
+  .fz@{size} {
+    font-size: (@i+1px);
+  }
+  .fontsize(@count,(@i+1));
+}

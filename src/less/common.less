@@ -1,0 +1,204 @@
+@import "variables";
+@import "mixins";
+
+* {
+  box-sizing: border-box;
+}
+
+body, html {
+  height: 100%;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  li {
+
+    list-style: none;
+
+  }
+
+}
+
+::-webkit-input-placeholder {
+  color: @gray;
+}
+
+::-moz-placeholder {
+  color: @gray;
+}
+
+:-ms-input-placeholder {
+  color: @gray;
+}
+
+.text-center {
+
+  text-align: center;
+
+}
+
+a {
+  text-decoration: none;
+  &:hover, &:focus, &:active {
+    text-decoration: none;
+  }
+}
+
+label {
+  font-weight: normal;
+}
+
+#app {
+  height: 100%;
+  font-size: 14px;
+}
+
+.page-wrap {
+  height: 100%;
+  min-width: 1260px;
+  padding: 80px 0 0 230px;
+}
+
+#content {
+  position: relative;
+  min-height: 100%;
+  background: #f0f2f9;
+  padding: 20px;
+  min-width: 1030px;
+}
+
+.clearfix {
+  .clearfix();
+}
+
+.fontsize(29);
+.btn {
+  display: inline-block;
+  padding: 6px 15px;
+  text-align: center;
+  font-weight: normal;
+  cursor: pointer;
+  color: @white;
+  text-decoration: none;
+  &:hover, &:focus, &:active {
+    color: @white;
+  }
+}
+
+.btn-blue {
+  background-color: @defaultBlue;
+}
+
+.btn-red {
+  background-color: @red;
+}
+
+.f-input {
+  height: 36px;
+  width: 160px;
+  padding: 5px;
+  line-height: 26px;
+  border: 1px solid @inputBorderColor;
+}
+
+.blue-fontIcon {
+  color: @defaultBlue;
+  .iconfont {
+    font-size: 20px;
+  }
+  &:hover, &:focus, &:active {
+    color: @defaultBlue
+  }
+}
+
+.red-fontIcon {
+  color: @red;
+  .iconfont {
+    font-size: 20px;
+  }
+  &:hover, &:focus, &:active {
+    color: @red
+  }
+}
+.gray-fontIcon {
+  color: #c4c4c4;
+  .iconfont {
+    font-size: 20px;
+  }
+  &:hover, &:focus, &:active {
+    color: #c4c4c4
+  }
+}
+
+.blueColor {
+  color: @defaultBlue;
+  &:hover, &:focus, &:active {
+    color: @defaultBlue
+  }
+}
+
+.redColor {
+  color: @red;
+  &:hover, &:focus, &:active {
+    color: @red
+  }
+}
+.w700 {
+  width: 700px;
+}
+/*加载*/
+.ui-loading {
+  background-color: rgba(0,0,0,0);
+  .el-loading-spinner {
+      .path {
+        stroke: @white;
+      }
+      .el-loading-text {
+        color:@white;
+      }
+
+  }
+  &.is-fullscreen {
+    .el-loading-spinner {
+      margin-top: -25px;
+      width: 200px;
+      background-color: rgba(0,0,0,0.8);
+      left: 50%;
+      padding: 15px 0;
+      margin-left: -100px;
+      border-radius: 3px;
+    }
+  }
+}
+
+/*模态框*/
+.modal-content {
+
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;;
+
+  .modal-header {
+    background-color: #2b3643;
+    padding: 10px 15px;
+    color: @white;
+    position: relative;
+    .modal-title {
+      font-size: 16px;
+    }
+
+  }
+  .close-modal {
+    position: absolute;
+    display: inline-block;
+    width: 20px;
+    right: 10px;
+    top: 10px;
+    text-align: center;
+    color: @white;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
