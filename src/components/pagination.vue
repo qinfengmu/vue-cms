@@ -169,32 +169,34 @@ export default {
   },
   methods: {
     loadPage (page,skip) {
-      if(!/^\d+$/.test(page)){
-          return;
-      }
-      //输入跳转页数验证
-      if(skip){
-          if(page == 0){
-              page = 1;
-          }else if(page > this.totalPages){
-            page = this.totalPages;
-          }
-          this.skipNum = page;
-      }
 
-      if(page == 'prev' && this.currentPage > 0){
-        page = --this.currentPage;
-      }else if(page == 'next' && this.currentPage < this.totalPages){
-        page = ++this.currentPage;
-      }
+        //输入跳转页数验证
+        if(skip){
+            if(!/^\d+$/.test(page)){
+                return;
+            }else{
+                if(page == 0){
+                    page = 1;
+                }else if(page > this.totalPages){
+                  page = this.totalPages;
+                }
+                this.skipNum = page;
+            }
+        }
 
-      this.$emit('pageChange', page);
+        if(page == 'prev' && this.currentPage > 0){
+          page = --this.currentPage;
+        }else if(page == 'next' && this.currentPage < this.totalPages){
+          page = ++this.currentPage;
+        }
+
+        this.$emit('pageChange', page);
     },
     isCurrentPage (page) {
-      return page === this.currentPage
+        return page == this.currentPage
     },
     setPaginationData (page) {
-      this.currentPage = page
+        this.currentPage = page;
     }
   }
 }
