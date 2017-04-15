@@ -33,6 +33,7 @@
           :class="{disabled: isLastPage}"
           title="最后一页"
         >&raquo;</a>
+        <span class="skip">跳到第 <input type="text" v-model="skipNum" class="skip-ipt"> 页 <input type="button" @click="loadPage(skipNum,true)" class="skip-btn" value="确定"></span>
         <span class="totalpage">共 {{totalPages}} 页</span>
       </div>
     </div>
@@ -97,6 +98,21 @@
       }
 
     }
+    .skip {
+      margin-left:10px;
+    }
+    .skip-ipt {
+      padding: 5px;
+      width: 45px;
+      height: 32px;
+      line-height: 22px;
+      border:1px solid #e4e4e4;
+      text-align: center;
+    }
+    .skip-btn {
+      height: 32px;
+      margin-left: 10px;
+    }
     margin-top: 10px;
 
   }
@@ -110,7 +126,8 @@ export default {
       currentPage: 1,
       totalPages: '',
       pageStart: '',
-      pageEnd: ''
+      pageEnd: '',
+      skipNum: '',
     }
   },
   computed: {
@@ -151,7 +168,19 @@ export default {
 
   },
   methods: {
-    loadPage (page) {
+    loadPage (page,skip) {
+      if(!/^\d+$/.test(page)){
+          return;
+      }
+      //输入跳转页数验证
+      if(skip){
+          if(page == 0){
+              page = 1;
+          }else if(page > this.totalPages){
+            page = this.totalPages;
+          }
+          this.skipNum = page;
+      }
 
       if(page == 'prev' && this.currentPage > 0){
         page = --this.currentPage;
@@ -166,7 +195,7 @@ export default {
     },
     setPaginationData (page) {
       this.currentPage = page
-    },
+    }
   }
 }
 
