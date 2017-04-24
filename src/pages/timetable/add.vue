@@ -99,19 +99,31 @@ import FileUpload from 'vue-upload-component'
         methods: {
 
           save () {
-           this.$http.post('/subwayTime/insert',{obj:JSON.stringify(this.formObj)})
-           .then( res => {
-              const msg = res.body
-              if(msg.result.success){
-                  this.$message.success({message: '时刻表添加成功' });
-                this.$router.replace('/timetable');
-              }else{
-                 this.$message.error({message: '时刻表添加失败' });
 
+              if(this.formObj.version == ''){
+                  this.$message.error({message: '请输入版本号!'});
+                  return;
+              }else if(this.formObj.verInfo == ''){
+                  this.$message.error({message: '请输入版本描述!'});
+                  return;
+              }else if(this.formObj.filePath == ''){
+                   this.$message.error({message: '请上传文件!'});
+                   return;
               }
-           }, res => {
-              this.$message.error({message: res.status+'-'+res.statusText });
-           })
+
+             this.$http.post('/subwayTime/insert',{obj:JSON.stringify(this.formObj)})
+             .then( res => {
+                const msg = res.body
+                if(msg.result.success){
+                    this.$message.success({message: '时刻表添加成功' });
+                  this.$router.replace('/timetable');
+                }else{
+                   this.$message.error({message: '时刻表添加失败' });
+
+                }
+             }, res => {
+                this.$message.error({message: res.statusText });
+             })
 
           },
           fileUpload (file) {

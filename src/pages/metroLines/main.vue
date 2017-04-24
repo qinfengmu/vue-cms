@@ -18,7 +18,7 @@
             <td>{{data.commitTime | date('YYYY-MM-DD HH:mm:ss')}}</td>
             <td class="action-td">
               <router-link class="blue-fontIcon" title="查看详情" :to="{ name: 'lineDetail', params: { id: data.id }}"><i class="iconfont icon-info"></i></router-link>
-              <router-link class="blue-fontIcon" title="复制" :to="{ name: 'copy', params: { id: data.id }}"><i class="iconfont icon-copy"></i></router-link>
+              <router-link class="blue-fontIcon" title="复制" :to="{ name: 'copyLine', params: { id: data.id }}"><i class="iconfont icon-copy"></i></router-link>
             </td>
           </tr>
           <tr v-if="versionLists == ''" class="text-center">
@@ -40,8 +40,8 @@
             <td>{{data.verInfo}}</td>
             <td>{{data.commitTime | date('YYYY-MM-DD HH:mm:ss')}}</td>
             <td class="action-td">
-              <router-link class="blue-fontIcon" title="编辑" :to="{ name: 'edit', params: { id: data.id }}"><i class="iconfont icon-modify"></i></router-link>
-              <router-link class="blue-fontIcon" title="复制" :to="{ name: 'copy', params: { id: data.id }}"><i class="iconfont icon-copy"></i></router-link>
+              <router-link class="blue-fontIcon" title="编辑" :to="{ name: 'editLine', params: { id: data.id }}"><i class="iconfont icon-modify"></i></router-link>
+              <router-link class="blue-fontIcon" title="复制" :to="{ name: 'copyLine', params: { id: data.id }}"><i class="iconfont icon-copy"></i></router-link>
               <a href="" class="red-fontIcon" title="删除"  @click.prevent="deleted(data)"><i class="iconfont icon-delete"></i></a>
             </td>
           </tr>
@@ -60,15 +60,6 @@
 <style lang="less" scoped>
   @import "../../less/variables";
   @import "../../less/mixins";
-
-  .action-list {
-    margin-bottom: 10px;
-    .clearfix();
-    li {
-      float: left;
-      margin-right: 20px;
-    }
-  }
 </style>
 <script>
     import uiPanel from '../../components/uiPanel'
@@ -140,7 +131,7 @@
                         }
                     }
                  }, res => {
-                this.$message.error({message: res.status+'-'+res.statusText });
+                this.$message.error({message: res.statusText });
              })
              },
              getPage(page){
@@ -170,7 +161,7 @@
                                this.$message.error({message: '删除失败!'});
                              }
                          }, res => {
-                            this.$message.error({message: res.status+'-'+res.statusText });
+                            this.$message.error({message: res.statusText });
                          })
                    }).catch(() => {});
              }

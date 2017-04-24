@@ -38,7 +38,7 @@
                 <td>{{data.phone}}</td>
                 <td>{{data.email}}</td>
                 <td class="action-td">
-                  <!--<router-link class="blue-fontIcon" title="修改" :to="{ name: 'editUser', params: { id: data.userId }}"><i class="iconfont icon-modify"></i></router-link>-->
+                  <router-link class="blue-fontIcon" title="修改" :to="{ name: 'editUser', params: { id: data.userId }}"><i class="iconfont icon-modify"></i></router-link>
                   <a href="" class="red-fontIcon" title="删除"  @click.prevent="deleted(data)"><i class="iconfont icon-delete"></i></a>
                 </td>
               </tr>
@@ -120,7 +120,7 @@ import pagination from '../../../components/pagination'
               }
 
            }, res => {
-              this.$message.error({message: res.status+'-'+res.statusText });
+              this.$message.error({message: res.statusText });
            })
         },
          //删除公告
@@ -144,7 +144,7 @@ import pagination from '../../../components/pagination'
                          this.$message.error({message: '用户删除失败!'});
                        }
                    }, res => {
-                      this.$message.error({message: res.status+'-'+res.statusText });
+                      this.$message.error({message: res.statusText });
                    })
               }).catch(() => {});
         },

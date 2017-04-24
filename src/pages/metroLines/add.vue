@@ -508,6 +508,7 @@ import { modal } from 'vue-strap'
                            // console.log('progress ' + file.progress);
                           },
                           after(file, component) {
+                            console.log(file)
                             this.$emit('fileUploaded',file.response);
                            // console.log('after');
                           },
@@ -548,7 +549,7 @@ import { modal } from 'vue-strap'
         methods: {
             getView () {
                  const id = this.$route.params.id || "";
-                 const url = this.$route.name == 'copy' ? '/api/subwayMap/copyVersion' : '/api/subwayMap/view';
+                 const url = this.$route.name == 'copyLine' ? '/api/subwayMap/copyVersion' : '/api/subwayMap/view';
                  this.$http.get(url,{params:{id: id}})
                  .then( (res) =>{
                     const msg = res.body;
@@ -562,7 +563,7 @@ import { modal } from 'vue-strap'
                         }
                     }
                  }, res => {
-                this.$message.error({message: res.status+'-'+res.statusText });
+                this.$message.error({message: res.statusText });
              })
             },
             //@type 1:编辑站点， 2：编辑连接点控制点，3：新增连接点和控制点；
@@ -644,7 +645,7 @@ import { modal } from 'vue-strap'
                         this.$message.error({message: '操作失败'});
                      }
                  }, res => {
-                this.$message.error({message: res.status+'-'+res.statusText });
+                this.$message.error({message: res.statusText });
              })
             },
             fileUploaded (res) {

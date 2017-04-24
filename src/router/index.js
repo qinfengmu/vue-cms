@@ -15,6 +15,7 @@ import equipment from '../pages/equipment'
 import message from '../pages/message'
 import appVersion from '../pages/appVersion'
 import logs from '../pages/logs'
+import system from '../pages/system'
 import login from '../pages/login'
 import notfound from '../pages/error/404'
 
@@ -26,12 +27,12 @@ const router = new Router({
     {
       path: '/',
       component: App,
-      meta: {auth: false, text: '首页'},
+      meta: { text: '首页'},
       redirect: '/app/setBgImage',
       children: [
         {
           path: '/app',
-          meta: {auth: false, text: 'APP显示设置'},
+          meta: { text: 'APP显示设置'},
           component: displaySettingIndex,
           redirect: '/app/setBgImage',
           children: [
@@ -42,7 +43,7 @@ const router = new Router({
         },
         {
           path: '/notice',
-          meta: {auth: false, text: '公告管理'},
+          meta: { text: '公告管理'},
           component: notice,
           children: [
             {path: '', component: require('../pages/notice/main'), meta: {text: ''}},
@@ -57,26 +58,66 @@ const router = new Router({
           ]
         },
         {
+          path: '/content',
+          meta: { text: '内容管理'},
+          component: system,
+          redirect: '/content/service',
+          children: [
+            {
+              path: 'service', component: require('../pages/content/service/index'), meta: {text: '乘客服务'},
+              children: [
+                {path: '', component: require('../pages/content/service/main'), meta: {text: ''}},
+                {path: 'add', component: require('../pages/content/service/add'), meta: {text: '新建内容'}},
+                {path: 'detail/:id', name: 'serviceDetail', component: require('../pages/content/service/detail'), meta: {text: '内容详情'}}
+              ]
+            },
+            {
+              path: 'knowledge', component: require('../pages/content/knowledge/index'), meta: {text: '地铁知识'},
+              children: [
+                {path: '', component: require('../pages/content/knowledge/main'), meta: {text: ''}},
+                {path: 'add', component: require('../pages/content/knowledge/add'), meta: {text: '新建内容'}},
+                {path: 'detail/:id', name: 'knowledgeDetail', component: require('../pages/content/knowledge/detail'), meta: {text: '内容详情'}}
+              ]
+            },
+            {
+              path: 'ticket', component: require('../pages/content/ticket/index'), meta: {text: '票务须知'},
+              children: [
+                {path: '', component: require('../pages/content/ticket/main'), meta: {text: ''}},
+                {path: 'add', component: require('../pages/content/ticket/add'), meta: {text: '新建内容'}},
+                {path: 'detail/:id', name: 'ticketDetail', component: require('../pages/content/ticket/detail'), meta: {text: '内容详情'}}
+              ]
+            },
+            {
+              path: 'operation', component: require('../pages/content/operation/index'), meta: {text: '运营动态'},
+              children: [
+                {path: '', component: require('../pages/content/operation/main'), meta: {text: ''}},
+                {path: 'add', component: require('../pages/content/operation/add'), meta: {text: '新建内容'}},
+                {path: 'detail/:id', name: 'operationDetail', component: require('../pages/content/operation/detail'), meta: {text: '内容详情'}}
+              ]
+            }
+          ]
+        },
+        {
           path: '/lines',
-          meta: {auth: false, text: '线路管理'},
+          meta: { text: '线路管理'},
           component: metroLines,
           redirect: '/lines/list',
           children: [
             {path: 'list', component: require('../pages/metroLines/main'), meta: {text: '版本列表'}},
             {path: 'detail/:id', name:"lineDetail", component: require('../pages/metroLines/add'), meta: {text: '版本详情'}},
             {path: 'add',component: require('../pages/metroLines/add'), meta: {text: '新建版本'}},
-            {path: 'copy/:id', name:'copy', component: require('../pages/metroLines/add'), meta: {text: '复制新建'}},
-            {path: 'edit/:id', name:'edit', component: require('../pages/metroLines/add'), meta: {text: '编辑'}}
+            {path: 'copy/:id', name:'copyLine', component: require('../pages/metroLines/add'), meta: {text: '复制新建'}},
+            {path: 'edit/:id', name:'editLine', component: require('../pages/metroLines/add'), meta: {text: '编辑'}}
           ]
         },
         {
           path: '/station',
-          meta: {auth: false, text: '站点管理'},
+          meta: { text: '站点管理'},
           component: station
         },
         {
           path: '/timetable',
-          meta: {auth: false, text: '时刻表管理'},
+          meta: { text: '时刻表管理'},
           component: timetable,
           children: [
 
@@ -93,7 +134,7 @@ const router = new Router({
         },
         {
           path: '/adv',
-          meta: {auth: false, text: '广告管理'},
+          meta: { text: '广告管理'},
           component: adv,
           children: [
             {path: '', component: advMain, meta: {text: ''}},
@@ -103,7 +144,7 @@ const router = new Router({
         },
         {
           path: '/equipment',
-          meta: {auth: false, text: '设备管理'},
+          meta: { text: '设备管理'},
           component: equipment,
           children: [
             {path: '', component: require('../pages/equipment/main'), meta: {text: ''}}
@@ -111,11 +152,12 @@ const router = new Router({
         },
         {
           path: '/message',
-          meta: {auth: false, text: '消息推送'},
+          meta: { text: '消息推送'},
           component: message,
           children: [
             {path: '', component: require('../pages/message/main'), meta: {text: ''}},
             {path: 'add', component: require('../pages/message/add'), meta: {text: '推送新消息'}},
+            {path: 'copy/:id', name: "copyMessage", component: require('../pages/message/add'), meta: {text: '推送新消息'}},
             {
               name: 'messageDetail',
               path: 'detail/:id',
@@ -126,12 +168,12 @@ const router = new Router({
         },
         {
           path: '/appVersion',
-          meta: {auth: false, text: 'App版本管理'},
+          meta: { text: 'App版本管理'},
           component: appVersion,
           children: [
 
             {path: '', component: require('../pages/appVersion/main'), meta: {text: ''}},
-            {path: 'upload', component: require('../pages/appVersion/add'), meta: {text: '上传APK'}},
+            {path: 'upload', component: require('../pages/appVersion/add'), meta: {text: '新建APP版本'}},
             {
               name: 'appVersionDetail',
               path: 'detail/:id',
@@ -143,21 +185,38 @@ const router = new Router({
         },
         {
           path: '/logs',
-          meta: {auth: false, text: '操作日志'},
+          meta: { text: '操作日志'},
           component: logs,
           children: [
             {path: '', component: require('../pages/logs/main'), meta: {text: ''}}
           ]
+        },
+        {
+          path: '/system',
+          meta: { text: '系统管理'},
+          component: system,
+          redirect: '/system/user',
+          children: [
+            {
+              path: 'user', component: require('../pages/system/user/index'), meta: {text: '用户管理'},
+              children: [
+                {path: '', component: require('../pages/system/user/main'), meta: {text: ''}},
+                {path: 'add', component: require('../pages/system/user/add'), meta: {text: '添加用户'}},
+                {path: 'edit/:id', name: 'editUser', component: require('../pages/system/user/edit'), meta: {text: '修改用户信息'}}
+              ]
+            }
+          ]
         }
-
       ]
     },
     {
       path: '/login',
+      meta: {auth: false},
       component: login
     },
     {
       path: '/notfound',
+      meta: {auth: false},
       component: notfound
     },
     {

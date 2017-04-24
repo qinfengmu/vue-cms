@@ -10,8 +10,8 @@
           </div>
           <div class="header-bar">
               <ul class="bar-list">
-                <li><img src="../assets/imgs/user.png" /><span>{{userName}}</span></li>
-                <li><a href="#"><img src="../assets/imgs/close.png" /></a></li>
+                <li><img src="../assets/imgs/user.png" /><span>{{user.userName}}</span></li>
+                <li><a href="#" @click.prevent="signOut"><img src="../assets/imgs/close.png" /></a></li>
               </ul>
           </div>
       </slot>
@@ -28,7 +28,7 @@
     width: 100%;
     background: @headerBgColor;
     overflow: auto;
-    z-index: 11;
+    z-index: 9999;
   }
   .header-logo{
       float: left;
@@ -71,11 +71,21 @@
   }
 </style>
 <script>
-
+    import {mapActions} from 'vuex'
     export default{
         data(){
             return{
-                userName:'超级管理员'
+                user: {}
+            }
+        },
+        created (){
+          this.user = this.$store.state.User
+        },
+        methods: {
+            ...mapActions(['logout']),
+            signOut () {
+               this.logout();
+               this.$router.replace('/login');
             }
         }
     }

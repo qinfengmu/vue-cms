@@ -3,36 +3,52 @@
     <add-form class="w700">
       <div slot="detail">
         <dl>
-          <dt>商户名称：</dt>
-          <dd class="default">{{data.name}}</dd>
+          <dt>消息描述：</dt>
+          <dd class="default">{{data.appDescribe}}</dd>
         </dl>
         <dl>
-          <dt>广告分类：</dt>
-          <dd class="default">{{data.type}}</dd>
+          <dt>标题：</dt>
+          <dd class="default">{{data.title}}</dd>
         </dl>
         <dl>
-          <dt>广告描述：</dt>
-          <dd class="default">{{data.adDescribe}}</dd>
+          <dt>消息内容：</dt>
+          <dd class="default">{{data.content}}</dd>
         </dl>
         <dl>
-          <dt>展示图片：</dt>
-          <dd>
-            <div class="upload-area">
-              <img width="150" :src="data.imgUrl">
+          <dt>目标用户：</dt>
+          <dd class="default">
+              {{data.targetUser == 0 ? '所有人':'-'}}
 
-            </div>
           </dd>
         </dl>
         <dl>
-          <dt>发布时间：</dt>
+          <dt>后续动作：</dt>
           <dd class="default">
+            {{data.afterOpen | messageAfterOpen}}
+            <p v-if="data.action">{{data.action}}</p>
+          </dd>
+        </dl>
+        <dl>
+          <dt>创建时间：</dt>
+          <dd class="default">
+            {{data.createTime | date('YYYY-MM-DD HH:mm:ss')}}
+          </dd>
+        </dl>  <dl>
+          <dt>推送时间：</dt>
+          <dd v-if="data.publishType == 0" class="default">
             {{data.publishTime | date('YYYY-MM-DD HH:mm:ss')}}
           </dd>
+          <dd v-else class="default">
+            {{data.publishTime | date('YYYY-MM-DD HH:mm:ss')}} <span style="margin-left:10px">{{data.publishReceiveTime}}小时内在线设备可以接收到消息</span>
+          </dd>
         </dl>
+
         <dl>
-          <dt>下线时间：</dt>
+          <dt>提醒方式：</dt>
           <dd class="default">
-            {{ data.offTime | date('YYYY-MM-DD HH:mm:ss')}}
+              <span v-if="data.playLights" style="margin-right:10px">{{data.playLights ? '呼吸灯' : ''}}</span>
+              <span v-if="data.playSound" style="margin-right:10px">{{ data.playSound ? '声音' :''}}</span>
+              <span v-if="data.playVibrate" style="margin-right:10px">{{data.playVibrate ? '震动' : ''}}</span>
           </dd>
         </dl>
 
@@ -61,17 +77,17 @@ import addForm from '../../components/addForm'
         methods: {
 
           getDetail () {
-             this.$http.get('/advertisement/view',{params:{id: this.$route.params.id}})
+             this.$http.get('/api/appMessage/view',{params:{id: this.$route.params.id}})
              .then( (res) =>{
                 const msg = res.body;
                 if(msg.success){
                   this.data = msg.result;
                 }else{
-                  alert('广告不存在！')
+                  this.$message.error({message: '消息不存在或已被删除！'})
                 }
 
              }, res => {
-                this.$message.error({message: res.status+'-'+res.statusText });
+                this.$message.error({message: res.statusText });
              })
           },
 

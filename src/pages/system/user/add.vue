@@ -62,16 +62,6 @@
                 }
             }
         },
-        computed: {
-            isEdit () {
-               return this.$route.name == 'editUser';
-            }
-        },
-        created () {
-           if(this.isEdit){
-             //this.getView();
-           }
-        },
         components:{
           addForm
         },
@@ -87,9 +77,6 @@
                      this.$message.error({ message: '密码长度不能小于6位！'});
                      return;
                 }else{
-                    console.log(patterns.letters(this.formObj.password))
-                    console.log(!patterns.number(this.formObj.password))
-                    console.log(!patterns.spechars(this.formObj.password))
                     if(!patterns.letters(this.formObj.password) || !patterns.number(this.formObj.password)  || !patterns.spechars(this.formObj.password)){
                         this.$message.error({ message: '密码必须包含字母、数字、特殊字符！'});
                         return;
@@ -109,7 +96,7 @@
                       this.$message.error({ message: '邮箱地址格式不正确！'});
                       return;
                 }
-                const url = this.isEdit ? '/api/user/update' : '/api/user/insert';
+                const url = '/api/user/insert';
 
 
                 this.$http.post(url,{obj:JSON.stringify(this.formObj)})
@@ -122,7 +109,7 @@
                          this.$message.error({ message: '保存失败' });
                      }
                  }, res => {
-                    this.$message.error({message: res.status+'-'+res.statusText });
+                    this.$message.error({message: res.statusText });
                  })
 
             },
@@ -138,7 +125,7 @@
                         this.$message.error({ message: '用户信息不存在！' });
                     }
                  }, res => {
-                    this.$message.error({message: res.status+'-'+res.statusText });
+                    this.$message.error({message: res.statusText });
                  })
             },
 

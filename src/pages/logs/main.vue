@@ -117,7 +117,7 @@ import pagination from '../../components/pagination'
               }
 
            }, res => {
-                this.$message.error({message: res.status+'-'+res.statusText });
+                this.$message.error({message: res.statusText });
              })
         },
         search (){

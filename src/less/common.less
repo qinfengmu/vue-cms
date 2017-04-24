@@ -73,6 +73,7 @@ label {
 }
 
 .fontsize(29);
+
 .btn {
   display: inline-block;
   padding: 6px 15px;
@@ -100,6 +101,7 @@ label {
   padding: 5px;
   line-height: 26px;
   border: 1px solid @inputBorderColor;
+  cursor: text;
 }
 
 .blue-fontIcon {
@@ -144,6 +146,12 @@ label {
     color: @red
   }
 }
+.yellowColor {
+  color:@yellow;
+  &:hover, &:focus, &:active {
+    color: @yellow;
+  }
+}
 .w700 {
   width: 700px;
 }
@@ -171,7 +179,19 @@ label {
     }
   }
 }
-
+.upload-area{
+    .el-upload__input {
+      display: none;
+    }
+}
+.action-list{
+  margin-bottom:10px;
+  .clearfix();
+  li{
+    float: left;
+    margin-right: 20px;
+  }
+}
 /*模态框*/
 .modal-content {
 
@@ -201,4 +221,12 @@ label {
       text-decoration: none;
     }
   }
+}
+/*switch开关*/
+.el-switch--wide .el-switch__label.el-switch__label--right span {
+   right: 6px;
+}
+.el-switch__label * {
+  top: 5px;
+  font-size: 12px;
 }

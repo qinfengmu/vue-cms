@@ -37,15 +37,11 @@
   }
   .date-picker {
     position: relative;
-    cursor: text;
     i {
       position: absolute;
       right: 10px;
-      top: 5px;
+      top: 6px;
       color:@defaultBlue;
-    }
-    .datepicker{
-      cursor: text;
     }
     .clearButton {
       display: inline-block;

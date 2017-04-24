@@ -7,20 +7,20 @@
       </div>
 
       <div class="login-form">
-          <form>
+          <form @submit.prevent="login">
             <div class="form-item-list">
 
               <div class="form-item">
-                <input placeholder="用户名">
+                <input placeholder="用户名" type="text" v-model="formObj.loginId">
               </div>
               <div class="form-item">
-                <input placeholder="密码">
+                <input placeholder="密码" type="password"  v-model="formObj.password">
               </div>
               <div class="form-item verify-item">
-                <input placeholder="验证码"> <span><img src="../../assets/imgs/verify.jpg"/></span>
+                <input placeholder="验证码"  type="text" maxlength="4" v-model.trim="formObj.code"> <span><img @click="changeSrc($event)"  :src="verifyCodeSrc"/></span>
               </div>
             </div>
-            <button class="btn btn-blue">登录</button>
+            <button type="submit" class="btn btn-blue">登录</button>
           </form>
       </div>
     </div>
@@ -33,7 +33,7 @@
   @fontBorder:1px solid #e6e6e6;
   .login{
 
-    height: 100%;
+    min-height: 100%;
     background: #2b3643;
 
   }
@@ -41,8 +41,8 @@
     width: 300px;
     margin: 0 auto;
     .img{
-      padding-top:70px;
-      text-align: center;
+       padding-top:70px;
+       text-align: center;
     }
   }
   .login-form {
@@ -67,14 +67,17 @@
       border:none;
     }
     .verify-item{
-      .clearfix();
+      position: relative;
+      //background-color: @white;
       input{
-        float: left;
         width: 205px;
       }
-      span{
+       span{
+        position: absolute;
+        right:0;
+        top:0;
         display: inline-block;
-        padding: 6px 0;
+        padding: 7px 0;
         background: @white;
         width: 93px ;
         border-left:1px solid #ececec;
@@ -84,12 +87,57 @@
   }
 </style>
 <script>
-
+    import { mapActions } from 'vuex'
     export default{
         data(){
             return{
-
+                formObj: {
+                    loginId: '',
+                    password: '',
+                    code: ''
+                }
             }
+        },
+        computed: {
+          verifyCodeSrc () {
+              return this.$store.state.User.verifyCodeUrl;
+          }
+        },
+        methods: {
+             login () {
+
+                  if(this.formObj.loginId == ''){
+                      this.$message.error({message:'请输入用户名！' });
+                      return;
+                  }else if(this.formObj.password == ''){
+                      this.$message.error({message: '请输入密码！' });
+                      return;
+                  }else if(this.formObj.code == ''){
+                     this.$message.error({message: '请输入验证码！' });
+                     return;
+                  }
+                 this.setLoadingText('正在登录...')
+                 this.$http.post('/api/login/login',{obj:JSON.stringify(this.formObj)})
+                 .then(res=>{
+                     var result = res.body;
+                     if(result.success){
+                         this.signIn(result.user);
+                         this.$message.success({message: '登录成功！' });
+                         this.$router.replace('/');
+                     }else{
+                         this.$message.error({message: result.msg });
+                         this.changeSrc();
+                         this.formObj.code = '';
+                     }
+                 },res=>{
+                    this.$message.error({message: res.statusText });
+                 })
+                return false;
+             },
+             changeSrc (obj) {
+                this.changeVerify();
+             },
+             ...mapActions(['signIn','setLoadingText','changeVerify'])
         }
 
     }

@@ -251,7 +251,7 @@ import stationInfo from './stationInfo'
                    this.lineLists = msg.result;
                    this.getStationLists(this.lineLists[0]);
                }, res => {
-                this.$message.error({message: res.status+'-'+res.statusText });
+                this.$message.error({message: res.statusText });
              })
            },
            //获取线路站点列表
@@ -266,7 +266,7 @@ import stationInfo from './stationInfo'
                       this.$message.error({message: '站点列表获取失败！'});
                    }
                }, res => {
-                this.$message.error({message: res.status+'-'+res.statusText });
+                this.$message.error({message: res.statusText });
              })
            },
            //获取站点信息
@@ -291,7 +291,7 @@ import stationInfo from './stationInfo'
                       this.$message.error({message: '站点信息获取失败！'});
                    }
                }, res => {
-                this.$message.error({message: res.status+'-'+res.statusText });
+                this.$message.error({message: res.statusText });
              })
            },
            //添加出站口
@@ -325,7 +325,7 @@ import stationInfo from './stationInfo'
                      }
 
                  }, res => {
-                    this.$message.error({message: res.status+'-'+res.statusText });
+                    this.$message.error({message: res.statusText });
                  })
            },
             //监听上传图片

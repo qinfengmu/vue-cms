@@ -6,15 +6,16 @@
             <dl>
               <dt>商户名称:</dt>
               <dd><input class="f-input" v-model="searchObj.name"/></dd>
-            </dl>            <dl>
-              <dt>广告分类:</dt>
-            <dd>
-              <select class="f-input" v-model="searchObj.type">
-                <option value="1">1</option>
-                <option value="2">2</option>
-              </select>
-            </dd>
             </dl>
+            <!--<dl>-->
+              <!--<dt>广告分类:</dt>-->
+            <!--<dd>-->
+              <!--<select class="f-input" v-model="searchObj.type">-->
+                <!--<option value="1">1</option>-->
+                <!--<option value="2">2</option>-->
+              <!--</select>-->
+            <!--</dd>-->
+            <!--</dl>-->
             <date-picker labelName="发布时间"  v-on:getStartTime="getStartTime"></date-picker>
             <date-picker labelName="下线时间"  v-on:getStartTime="getEndTime"></date-picker>
             <dl>
@@ -37,8 +38,8 @@
               <tr v-for="data in tableData">
                 <!--<td><input type="checkbox" :value="data.id" @change="write($event)" v-model="checkedNames"></td>-->
                 <td>{{data.name}}</td>
-                <td>{{data.type}}</td>
-                <td><span class="count">{{data.clicks}}</span></td>
+                <td>{{data.info}}</td>
+                <td><span class="yellowColor">{{data.clicks}}</span></td>
                 <td>{{data.publishTime | date('YYYY-MM-DD HH:mm:ss')}}</td>
                 <td>{{data.offTime | date('YYYY-MM-DD HH:mm:ss')}}</td>
                 <td><router-link class="blue-fontIcon" title="查看详情" :to="{ name: 'advDetail', params: { id: data.id }}"><i class="iconfont icon-info"></i></router-link></td>
@@ -54,19 +55,6 @@
     </div>
 </template>
 <style lang="less" scoped>
-  @import "../../less/mixins";
-  @import "../../less/variables";
-  .action-list{
-    margin-bottom:10px;
-    .clearfix();
-    li{
-      float: left;
-      margin-right: 20px;
-    }
-  }
-  .count {
-    color:@yellow;
-  }
 </style>
 <script>
 import uiTable from '../../components/uiTable'
@@ -82,16 +70,17 @@ import pagination from '../../components/pagination'
                 publishTime: '',
                 offTime: '',
                 name: '',
-                type: ''
+               // type: ''
               },
               headerArray: [
               //{name: '选择',width:'5%'},
-              {name: '商户名称', width:'25%'},
-              {name: '广告分类'},
+              {name: '商户名称', width:'20%'},
+              //{name: '广告分类'},
+              {name: '广告描述', width:'25%'},
               {name: '点击次数'},
               {name: '发布时间'},
               {name: '下线时间'},
-              {name: '操作',width:'5%'},
+              {name: '操作'},
              ],
              tableTotalPage:0,
              pageSize: 10,
@@ -140,12 +129,10 @@ import pagination from '../../components/pagination'
               }
 
            }, res => {
-                this.$message.error({message: res.status+'-'+res.statusText });
+                this.$message.error({message: res.statusText });
              })
         },
-        write (t) {
-            console.log(t.target.checked);
-        },
+
         getStartTime (time) {
           this.searchObj.publishTime = time;
         },

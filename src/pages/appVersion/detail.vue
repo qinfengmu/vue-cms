@@ -7,7 +7,7 @@
           <dd class="default">{{data.name}}</dd>
         </dl>
         <dl>
-          <dt>APK简介：</dt>
+          <dt>APP简介：</dt>
           <dd class="default">{{data.type}}</dd>
         </dl>
         <dl>

@@ -44,6 +44,9 @@
                 <li><input type="radio"  v-model="formObj.afterOpen" value="2" id="afterOpen3"><label for="afterOpen3">打开指定页面</label></li>
                 <li><input type="radio"  v-model="formObj.afterOpen" value="3" id="afterOpen4"><label for="afterOpen4">自定义行为</label></li>
               </ul>
+              <div v-show="formObj.afterOpen != 0" class="showTime">
+                  <input  v-model="formObj.action" class="ipt" style="width:400px" type="text"/>
+              </div>
 
             </dd>
           </dl>
@@ -52,11 +55,17 @@
             <dd>
 
               <ul class="radio-list">
-                <li><input type="radio" v-model="formObj.publishType" value="0" id="publishType1"><label for="publishType1">立即推送</label></li>
+                <li><input type="radio" v-model="formObj.publishType"  @change="setPublishTime" value="0" id="publishType1"><label for="publishType1">立即推送</label></li>
                 <li><input type="radio" v-model="formObj.publishType" value="1" id="publishType2"><label for="publishType2">定时推送</label></li>
               </ul>
               <div v-show="formObj.publishType == 1" class="showTime">
-                <input v-model="formObj.publishTime" class="ipt ipt-medium"><input v-model="formObj.publishReceiveTime" class="ipt ipt-small"><span>小时内在线设备可以接收到消息</span>
+                <el-date-picker
+                  v-model="formObj.publishTime"
+                  type="datetime"
+                  placeholder="选择推送时间">
+                </el-date-picker>
+                <!--@change="datePickerChange"-->
+                <input v-model="formObj.publishReceiveTime" class="ipt ipt-small"><span>小时内在线设备可以接收到消息</span>
               </div>
 
             </dd>
@@ -71,19 +80,11 @@
               </ul>
             </dd>
           </dl>
-          <!--<dl>-->
-            <!--<dt>通知栏：</dt>-->
-            <!--<dd>-->
-              <!--<ul class="radio-list">-->
-                <!--<li><input type="checkbox"  value="1" id="send112"><label for="send112">显示</label></li>-->
-
-              <!--</ul>-->
-
-            <!--</dd>-->
-          <!--</dl>-->
-
         </div>
-
+        <div  class="button-area" slot="buttonArea">
+          <button type="submit" class="btn btn-blue">推送</button>
+          <router-link to="/notice" class="btn btn-red" replace>取消</router-link>
+        </div>
       </add-form>
 
 </template>
@@ -105,9 +106,9 @@ import addForm from '../../components/addForm'
                     publishType: 0,
                     publishTime: '',
                     publishReceiveTime: '',
-                    playVibrate: false,
-                    playLights: false,
-                    playSound: false,
+                    playVibrate: true,
+                    playLights: true,
+                    playSound: true
                 }
 
             }
@@ -115,23 +116,67 @@ import addForm from '../../components/addForm'
         components:{
           addForm
         },
+        computed: {
+           isCopy () {
+               return this.$route.name == 'copyMessage';
+            },
+        },
+        created () {
+          if(this.isCopy){
+              this.getView();
+          }
+        },
         methods: {
 
-          save () {
-           this.$http.post('/api/appMessage/insert',{obj:JSON.stringify(this.formObj)})
-           .then( res => {
-               const msg = res.body
-               if(msg.result.success){
-                  alert('添加成功!')
-               }else{
-                  alert('添加失败!')
-               }
+            save () {
 
-           }, res => {
-                this.$message.error({message: res.status+'-'+res.statusText });
-             })
+                  if(this.formObj.appDescribe == '' || this.formObj.title == '' || this.formObj.content == ''){
+                      this.$message.error({message: '推送信息内容不完整!'});
+                      return;
+                  }
+                  if(this.formObj.publishType == 1 && (this.formObj.publishTime == '' || this.formObj.publishReceiveTime == '')){
+                      this.$message.error({message: '请输入推送时间和接收时间！'});
+                      return;
+                  }
 
-          }
+                  this.formObj.publishTime = new Date(this.formObj.publishTime).getTime();
+
+                 this.$http.post('/api/appMessage/insert',{obj:JSON.stringify(this.formObj)})
+                 .then( res => {
+                     const msg = res.body
+                     if(msg.success){
+                        this.$message.success({message:'推送成功！'});
+                        this.$router.replace('/message');
+                     }else{
+                        this.$message.success({message:'推送失败！'});
+                     }
+
+                 }, res => {
+                    this.$message.error({message: res.statusText });
+                 })
+
+            },
+            getView () {
+                 this.$http.get('/api/appMessage/copyAppMessage',{params:{id: this.$route.params.id}})
+                 .then( (res) =>{
+                    const msg = res.body;
+                    if(msg.success){
+                      this.formObj = msg.result;
+                    }else{
+                      this.$message.error({message: '消息不存在或已被删除！'})
+                    }
+
+                 }, res => {
+                    this.$message.error({message: res.statusText });
+                 })
+            },
+            //选择立即发送时，清空定时发送时间
+            setPublishTime () {
+                if(this.formObj.publishType == 0){
+                  this.formObj.publishTime = '';
+                  this.formObj.publishReceiveTime = '';
+                }
+            },
 
 
         }

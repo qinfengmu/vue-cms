@@ -42,15 +42,14 @@
         <ui-table :headerArray="headerArray" :style="{minHeight:tableMinHeight}">
             <tbody slot="tbody">
               <tr v-for="data in tableData">
-                <td><input type="checkbox" :value="data.id" @change="write($event)" v-model="checkedNames"></td>
                 <td>{{data.appDescribe}}</td>
-                <td>{{data.targetUser}}</td>
+                <td>{{data.targetUser == 0 ? '所有人' : '-'}}</td>
                 <td>{{data.createTime | date('YYYY-MM-DD HH:mm:ss')}}</td>
                 <td>{{data.publishTime | date('YYYY-MM-DD HH:mm:ss')}}</td>
                 <td class="action-td">
-                  <router-link class="blue-fontIcon" title="编辑" :to="{ name: 'edit', params: { id: data.id }}"><i class="iconfont icon-modify"></i></router-link>
-                  <router-link class="blue-fontIcon" title="复制" :to="{ name: 'copy', params: { id: data.id }}"><i class="iconfont icon-copy"></i></router-link>
-                  <a href="" class="red-fontIcon" title="删除"  @click.prevent="deleted(data)"><i class="iconfont icon-delete"></i></a>
+                  <router-link class="blue-fontIcon" title="详情" :to="{ name: 'messageDetail', params: { id: data.id }}"><i class="iconfont icon-info"></i></router-link>
+                  <router-link class="blue-fontIcon" title="复制" :to="{ name: 'copyMessage', params: { id: data.id }}"><i class="iconfont icon-copy"></i></router-link>
+                  <!--<a href="" class="red-fontIcon" title="删除"  @click.prevent="deleted(data)"><i class="iconfont icon-delete"></i></a>-->
                 </td>
               </tr>
               <tr v-if="tableData == ''" class="text-center">
@@ -66,17 +65,6 @@
 <style lang="less" scoped>
   @import "../../less/mixins";
   @import "../../less/variables";
-  .action-list{
-    margin-bottom:10px;
-    .clearfix();
-    li{
-      float: left;
-      margin-right: 20px;
-    }
-  }
-  .count {
-    color:@yellow;
-  }
 </style>
 <script>
 import uiTable from '../../components/uiTable'
@@ -94,12 +82,12 @@ import pagination from '../../components/pagination'
                 publishTime: ''
               },
               headerArray: [
-                {name: '消息描述',width:'20%'},
-                {name: '人群', width:'10%'},
-                {name: '创建时间'},
-                {name: '推送时间'},
+                {name: '消息描述'},
+                {name: '人群', width:'20%'},
+                {name: '创建时间',width:'20%'},
+                {name: '推送时间',width:'20%'},
                 //{name: '状态'},
-                {name: '操作',width:'15%'}
+                {name: '操作',width:'10%'}
              ],
              tableTotalPage:0,
              pageSize: 10,
@@ -141,7 +129,7 @@ import pagination from '../../components/pagination'
               }
 
            }, res => {
-              this.$message.error({message: res.status+'-'+res.statusText });
+              this.$message.error({message: res.statusText });
            })
         },
         getStartTime (time) {

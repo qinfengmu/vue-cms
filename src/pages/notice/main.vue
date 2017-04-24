@@ -29,7 +29,7 @@
       <panel-wrap class="panelWrap2">
 
         <ul class="action-list">
-          <li><router-link to="/notice/add" class="btn btn-blue">新建公告</router-link></li>
+          <li><router-link to="/notice/add" class="btn btn-blue">发布公告</router-link></li>
         </ul>
 
         <ui-table :headerArray="headerArray" :style="{minHeight:tableMinHeight}">
@@ -38,16 +38,18 @@
                 <td>{{data.title}}</td>
                 <td><img height="55" width="99" :src="data.imgUrl"></td>
                 <td><span :class="stateClass(data.state)">{{data.state | noticeState}}</span></td>
+                <td>{{data.isTop == 1 ? '是': '否' }}</td>
                 <td>{{data.publishTime | date('YYYY-MM-DD HH:mm:ss')}}</td>
                 <td>{{data.offTime | date('YYYY-MM-DD HH:mm:ss')}}</td>
                 <td class="action-td">
                   <router-link class="blue-fontIcon" title="查看详情" :to="{ name: 'noticeDetail', params: { id: data.id }}"><i class="iconfont icon-info"></i></router-link>
-                  <a href="" v-if="data.state == 1" class="blue-fontIcon" @click.prevent="toTop(data)" ><i class="iconfont icon-up"></i></a>
-                  <a href="" class="red-fontIcon" @click.prevent="deleted(data)"><i class="iconfont icon-delete"></i></a>
+                  <a href="" v-if="data.state == 1 && data.isTop == 0"  title="置顶" class="blue-fontIcon" @click.prevent="toTop(data)" ><i class="iconfont icon-up"></i></a>
+                  <a href="" v-else-if="data.state == 1 && data.isTop == 1" title="取消置顶" class="blue-fontIcon" @click.prevent="offTop(data)" ><i class="iconfont icon-down" style="font-size:24px"></i></a>
+                  <a href="" class="red-fontIcon" title="删除" @click.prevent="deleted(data)"><i class="iconfont icon-delete"></i></a>
                 </td>
               </tr>
               <tr v-if="tableData == ''" class="text-center">
-                  <td colspan="6">无数据</td>
+                  <td colspan="7">无数据</td>
               </tr>
             </tbody>
 
@@ -60,17 +62,6 @@
 <style lang="less" scoped>
   @import "../../less/mixins";
   @import "../../less/variables";
-  .action-list{
-    margin-bottom:10px;
-    .clearfix();
-    li{
-      float: left;
-      margin-right: 20px;
-    }
-  }
-  .count {
-    color:@yellow;
-  }
 </style>
 <script>
 import uiTable from '../../components/uiTable'
@@ -92,6 +83,7 @@ import pagination from '../../components/pagination'
               {name: '标题',width:'20%'},
               {name: '封面', width:'20%'},
               {name: '发布状态'},
+              {name: '是否置顶'},
               {name: '发布时间'},
               {name: '下线时间'},
               {name: '操作',width:'10%'},
@@ -136,7 +128,7 @@ import pagination from '../../components/pagination'
               }
            }, res => {
 
-              this.$message.error({message: res.status+'-'+res.statusText });
+              this.$message.error({message: res.statusText });
 
            })
         },
@@ -173,7 +165,7 @@ import pagination from '../../components/pagination'
                          this.$message.error({message: '删除失败!'});
                        }
                    }, res => {
-                      this.$message.error({message: res.status+'-'+res.statusText });
+                      this.$message.error({message: res.statusText });
                    })
               }).catch(() => {});
         },
@@ -184,13 +176,26 @@ import pagination from '../../components/pagination'
                 const msg = res.body;
                 if(msg.success){
                   this.$message.success({message: '置顶成功'});
+                  this.getPage();
                 }else{
                   this.$message.error({message: '置顶失败!'});
                 }
             }, res => {
-
-              this.$message.error({message: res.status+'-'+res.statusText });
-
+              this.$message.error({message: res.statusText });
+           })
+        },
+        offTop (data) {
+              this.$http.post('/api/notice/offTop',{id: data.id})
+            .then( res => {
+                const msg = res.body;
+                if(msg.success){
+                  this.$message.success({message: '取消置顶成功'});
+                  this.getPage();
+                }else{
+                  this.$message.error({message: '取消置顶失败!'});
+                }
+            }, res => {
+              this.$message.error({message: res.statusText });
            })
         },
          stateClass (state) {

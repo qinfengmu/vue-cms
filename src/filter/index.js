@@ -15,40 +15,24 @@ return d.format(format)
 /*公告管理--状态过滤器*/
 Vue.filter('noticeState', (state) => {
 
-  let stateText = '';
+  const textArr = ['未发布','已发布','已下线'];
 
-  switch (state) {
-
-    case 0:
-      stateText = '未发布';
-      break;
-    case 1:
-      stateText = '已发布';
-      break;
-    case 2:
-    stateText = '已下线';
-    break;
-  }
-  return stateText;
+  return textArr[state] ? textArr[state] : '';
 
 })
 /*线路管理-站点类型过滤器*/
 Vue.filter('pointState', (state) => {
 
-  let stateText = '';
+  const textArr = ['站点','连接点','控制点'];
 
-  switch (state) {
+return textArr[state] ? textArr[state] : '';
 
-    case 0:
-      stateText = '站点';
-      break;
-    case 1:
-      stateText = '连接点';
-      break;
-    case 2:
-    stateText = '控制点';
-    break;
-  }
-  return stateText;
+})
+//消息推送--后续动作
+Vue.filter('messageAfterOpen', (state) => {
+
+  const textArr = ['打开应用','打开链接','打开指定页面','自定义行为'];
+
+return textArr[state] ? textArr[state] : '';
 
 })

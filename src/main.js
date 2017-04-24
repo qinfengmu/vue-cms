@@ -13,8 +13,8 @@ import  './less/common.less'
 import  components from './components'
 import  VueValidator from 'vue-validator'
 import { Loading } from 'element-ui'
-//Vue.config.productionTip = false
 
+//Vue.config.productionTip = false
 
 Vue.use(VueValidator);
 Vue.use(VueResource);
@@ -26,9 +26,24 @@ Object.keys(components).forEach((key) => {
 
 });
 
+//页面登录权限控制，默认需要登录
+router.beforeEach(({meta,path},from,next) => {
+
+    let {auth = true } = meta;
+    let isLogin = typeof(stores.state.User.userId) != 'undefined' ? true : false;
+    if(auth && !isLogin && path !=='/login'){
+      return next({path:'/login'});
+    }
+
+    if(isLogin && path == '/login'){
+      return next({path:'/'});
+    }
+
+    next();
+})
 //面包屑导航值保存到vuex中
-router.afterEach(router => {
-  stores.commit('setBreadCrumbs', router.matched)
+router.afterEach( router => {
+  stores.commit('setBreadCrumbs',router.matched);
 })
 /* eslint-disable no-new */
 new Vue({
@@ -36,7 +51,8 @@ new Vue({
   router
 }).$mount('#app');
 
-//拦截
+
+//拦截器
 Vue.http.options.emulateJSON = true;
 Vue.http.interceptors.push( (request, next) => {
 
@@ -45,7 +61,11 @@ Vue.http.interceptors.push( (request, next) => {
   if(request.method.toUpperCase() == 'POST') {
     text = '正在提交...';
   }
-
+  //如果vuex中设置了加载提示文本
+  if(stores.state.loading.text != ''){
+    text = stores.state.loading.text;
+  }
+  //全局加载提示
   let loadingInstance = Loading.service({
       body: false,
       fullscreen: true,
@@ -54,8 +74,28 @@ Vue.http.interceptors.push( (request, next) => {
       customClass:'ui-loading'
   });
 
-  next((response) => {
-      loadingInstance.close();
-      text = "正在加载...";
-  })
+  setTimeout(function () {
+      next((response) => {
+        //从vuex取出状态文本
+        const statusText = stores.state.responseStatus[response.status];
+        //关闭加载
+        loadingInstance.close();
+        //重置提示文本
+        text = "正在加载...";
+        stores.dispatch('setLoadingText','');
+
+        response.statusText = typeof(statusText) != 'undefined' ? statusText : response.statusText;
+
+        switch (response.status){
+          case 401 :
+            stores.dispatch('logout');
+            router.replace('/login');
+          break;
+          default:
+          break;
+        }
+
+      })
+  },500)
+
 })

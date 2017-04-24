@@ -4,7 +4,7 @@ export default {
       {
         name: 'APP显示设置',
         url: '/app',
-        iconClass: 'icon-home',
+        iconClass: 'icon-home'
         // showSubNav: true,
         // subNav: [
         //   {
@@ -25,6 +25,31 @@ export default {
         name: '公告管理',
         iconClass: 'icon-voice fz20',
         url: '/notice'
+
+      },
+      {
+        name: '内容管理',
+        iconClass: 'icon-list fz13',
+        url: '/content',
+        showSubNav: false,
+        subNav: [
+          {
+            name: '乘客服务',
+            url: '/content/service'
+          },
+          {
+            name: '地铁知识',
+            url: '/content/knowledge'
+          },
+          {
+            name: '票务须知',
+            url: '/content/ticket'
+          },
+          {
+            name: '运营动态',
+            url: '/content/operation'
+          }
+        ]
 
       },
       {

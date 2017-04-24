@@ -17,6 +17,10 @@
           <dt>标题内容：</dt>
           <dd class="default">{{data.title}}</dd>
         </dl>
+        <dl class="dl2">
+          <dt>内容页链接：</dt>
+          <dd class="default">{{data.url}}</dd>
+        </dl>
         <dl>
           <dt>文本编辑：</dt>
           <dd class="default">{{data.content}}</dd>
@@ -24,17 +28,17 @@
         <dl>
           <dt>封面图片：</dt>
           <dd class="default">
-            <img :src="data.imgUrl" width="100" height="60">
+            <img :src="data.imgUrl" width="198" height="110">
           </dd>
         </dl>
         <dl>
-          <dt>发布定时：</dt>
+          <dt>发布时间：</dt>
           <dd class="default">
             {{data.publishTime | date('YYYY-MM-DD HH:mm:ss')}}<span v-if="data.publishType == 1" style="margin-left:40px">{{data.publishReceiveTime}} 小时内在线设备可以接收到消息</span>
           </dd>
         </dl>
         <dl>
-          <dt>下线定时：</dt>
+          <dt>下线时间：</dt>
           <dd class="default" v-if="data.offType == 0">永不下线</dd>
           <dd class="default" v-else>{{data.offTime | date('YYYY-MM-DD HH:mm:ss')}}</dd>
 
@@ -136,7 +140,7 @@ import uiTable from '../../components/uiTable'
               }
 
             }, res => {
-                this.$message.error({message: res.status+'-'+res.statusText });
+                this.$message.error({message: res.statusText });
              })
 
           }

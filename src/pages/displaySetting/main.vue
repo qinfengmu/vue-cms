@@ -83,7 +83,9 @@
               <dl class="dl2">
                 <dt>展示图片：</dt>
                 <dd>
+
                   <div class="upload-area">
+
                     <img v-if="bgObj.imgUrl" width="198" height="110" :src="imgUrl">
                           <file-upload
                           class="upload-img-btn"
@@ -101,7 +103,7 @@
                           :data="uploadBtn.data">
 
                           </file-upload>
-                    </div>
+                  </div>
                 </dd>
                 </dl>
             </div>
@@ -132,9 +134,9 @@
               <td><span class="count">{{data.clicks}}</span></td>
               <td>{{data.publishTime | date('YYYY-MM-DD HH:mm:ss')}}</td>
               <td>{{data.offTime | date('YYYY-MM-DD HH:mm:ss')}}</td>
-              <td><a href @click.prevent="setAdvTop(data)">置顶</a></td>
+              <td><a href @click.prevent="setAdvTop(data)">选择</a></td>
             </tr>
-            <tr v-if="advLists == ''" class="text-center">
+            <tr v-if="selectAdvLists == ''" class="text-center">
               <td colspan="7">无数据</td>
             </tr>
             </tbody>
@@ -144,9 +146,9 @@
         <div slot="modal-footer" v-show="false" class="modal-footer">
         </div>
       </modal>
-      <input type="file" id="upload_img"  />
-      <img id="preview_size_fake" width=100 height=100 border=0 src=''>
-      <a @click.prevent="cg" href="">加载 </a>
+      <!--<input type="file" id="upload_img"  />-->
+      <!--<img id="preview_size_fake" width=100 height=100 border=0 src=''>-->
+      <!--<a @click.prevent="cg" href="">加载 </a>-->
     </div>
 
 </template>
@@ -317,6 +319,7 @@
               {name: '投放下线时间'},
               {name: '操作',width:'8%'},
             ],
+
             uploadBtn: {
                 accept: 'image/jpg,image/jpeg,image/png',
                 size: 1024 * 1024 * 10,
@@ -337,14 +340,17 @@
                         file.headers['X-Filename'] = encodeURIComponent(file.name)
                         file.data.finename = file.name
                         var _this = this;
-                        imgSize(this,file,component);
-
+                         if(typeof FileReader != 'undefined'){
+                            imgSize(this,file,component);
+                         }else{
+                            component.active = true;
+                         }
                       },
                       progress(file, component) {
                        // console.log('progress ' + file.progress);
                       },
                       after(file, component) {
-                        this.$emit('bgUpload',file.response);
+                        this.$emit('bgUpload',file);
                        // console.log('after');
                       },
                       before(file, component) {
@@ -378,222 +384,231 @@
 
         },
         methods: {
-        cg () {
+            cg () {
 
-            if( typeof (FileReader) != 'undefined'){
-                var MyTest = document.getElementById("upload_img").files[0];
-                var reader = new FileReader();
-                reader.readAsDataURL(MyTest);
-                reader.onload = function(theFile) {
-                  var image = new Image();
-                   image.src = theFile.target.result;
-                   image.onload = function() {
-                      alert("图片的宽度为"+this.width+",长度为"+this.height);
-                   };
-                };
-            }else{
-                var ipt = document.getElementById('upload_img')
-                ipt.select();
-                ipt.blur();
-                var src = document.selection.createRange().text;
-                var img = document.getElementById('preview_size_fake');
-                console.log(img.filters)
-                img.filters.item('DXImageTransform.Microsoft.AlphaImageLoader').src = src;
-                console.log(img.offsetWidth)
-            }
-        },
-        //定义初始化读取背景图片列表信息
-          getBgLists () {
-            this.$http.get('/backgroundImg/getLists')
-             .then( res => {
-                 const msg = res.body
-                 this.BgLists = msg.result;
-             }, res => {
-                this.$message.error({message: res.status+'-'+res.statusText });
-             })
-          },
-          //定义初始化读取功能配置
-          getActionLists () {
-            this.$http.get('/homeFunction/getLists')
-             .then( res => {
-                 const msg = res.body
-                 this.actionLists = msg.result;
-             }, res => {
-                this.$message.error({message: res.status+'-'+res.statusText });
-             })
-          },
-          //保存功能设置
-          saveActions () {
-
-             const actionList = this.actionLists.map ( action => _.pick(action,['id','state']) )
-
-              this.$http.post('/homeFunction/updateState',{obj: JSON.stringify(actionList)})
-                 .then( res => {
-                     const msg = res.body
-                     if(msg.success){
-                       this.$message.success({message: '保存成功'});
-                     }else{
-                       this.$message.error({message: '保存失败'});
-                     }
-                 }, res => {
-                this.$message.error({message: res.status+'-'+res.statusText });
-             })
-
-          },
-          //定义获取广告列表 state 状态 page： 分页
-       getAdvList (state,page) {
-         this.$http.get('/advertisement/getLists',{params:{pageNum: page || 1, pageSize: this.pageSize, obj: JSON.stringify({ state: state})}})
-           .then( (res) =>{
-              const msg = res.body;
-              if(msg.result.success){
-                  if(state == 1){
-                    this.advLists = msg.result.data;
-                  }else{
-                      this.selectAdvLists = msg.result.data;
-                      this.tableTotalPage = msg.result.total;
-
-                    if(this.$refs.pagination){
-                        this.$refs.pagination.setPaginationData(page);
-                    }
-                  }
-              }
-
-           }, res => {
-                this.$message.error({message: res.status+'-'+res.statusText });
-             })
-        },
-          //保存设置背景图片
-          saveBgInfo () {
-
-            const url = this.bgObj.id != '' ? '/backgroundImg/update' : '/backgroundImg/insert'
-
-            if( this.bgObj.name != '' &&  this.bgObj.imgUrl != ''){
-                this.$http.post(url,{obj:JSON.stringify(this.bgObj)})
+                if( typeof (FileReader) != 'undefined'){
+                    var MyTest = document.getElementById("upload_img").files[0];
+                    var reader = new FileReader();
+                    reader.readAsDataURL(MyTest);
+                    reader.onload = function(theFile) {
+                      var image = new Image();
+                       image.src = theFile.target.result;
+                       image.onload = function() {
+                          alert("图片的宽度为"+this.width+",长度为"+this.height);
+                       };
+                    };
+                }else{
+                    var ipt = document.getElementById('upload_img')
+                    ipt.select();
+                    ipt.blur();
+                    var src = document.selection.createRange().text;
+                    var img = document.getElementById('preview_size_fake');
+                    console.log(img.filters)
+                    img.filters.item('DXImageTransform.Microsoft.AlphaImageLoader').src = src;
+                    console.log(img.offsetWidth)
+                }
+            },
+            //定义初始化读取背景图片列表信息
+            getBgLists () {
+              this.$http.get('/backgroundImg/getLists')
                .then( res => {
                    const msg = res.body
-                   if(msg.success){
-                      this.$message.success({
-                          message: '背景图片设置成功'
-                        });
-                      this.showBgModal = false;
-                      this.getBgLists();
-                   }else{
-                    this.$message.error({
-                          message: '背景图片设置失败',
-                        });
-                   }
+                   this.BgLists = msg.result;
                }, res => {
-                this.$message.error({message: res.status+'-'+res.statusText });
-             })
-            }else {
+                  this.$message.error({message: res.statusText });
+               })
+            },
+            //定义初始化读取功能配置
+            getActionLists () {
+              this.$http.get('/homeFunction/getLists')
+               .then( res => {
+                   const msg = res.body
+                   this.actionLists = msg.result;
+               }, res => {
+                  this.$message.error({message: res.statusText });
+               })
+            },
+            //保存功能设置
+            saveActions () {
 
-             this.$message.error({
-                  message: '信息不完整'
-                });
+               const actionList = this.actionLists.map ( action => _.pick(action,['id','state']) )
 
-            }
-          },
-          //删除背景图片
-          deleteBgImg (obj) {
-
-              this.$messageBox.confirm('确定要删除该图片？','提示',{
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-              }).then( () => {
-                    this.$http.post('/backgroundImg/delete',{id: obj.id})
+                this.$http.post('/homeFunction/updateState',{obj: JSON.stringify(actionList)})
                    .then( res => {
                        const msg = res.body
                        if(msg.success){
-                          this.$message.success({
-                              message: '图片删除成功'
-                            });
-                          this.resetBgObj();
-                          this.getBgLists();
+                         this.$message.success({message: '保存成功'});
                        }else{
-                         this.$message.error({
-                              message: '删除失败!'
-                            });
+                         this.$message.error({message: '保存失败'});
                        }
                    }, res => {
-                this.$message.error({message: res.status+'-'+res.statusText });
-             })
-              }).catch(() => {});
+                  this.$message.error({message: res.statusText });
+               })
 
-          },
-          //显示背景图片上传模态
-        showBgUpload (obj) {
+            },
+            //定义获取广告列表 @state 1:首页显示 0:不在首页显示
+            //状态 @page： 分页,
+            //发布状态 @publishState
+            getAdvList (state,page) {
 
-          if(obj) {
-              this.bgObj.name = obj.name;
-              this.bgObj.id = obj.id;
-          }
-          this.showBgModal = true;
-        },
-        //关闭设置背景图片模态框
-        closeBgUpload () {
-          this.showBgModal = false;
-          this.resetBgObj();
-        },
-        resetBgObj () {
-          this.bgObj.name = '';
-          this.bgObj.imgUrl = '';
-          this.bgObj.id = '';
-        },
-        //监听上传图片
-        bgImgUploaded (res){
-          if(res.filePath){
-              this.bgObj.imgUrl = res.filePath;
-              this.imgUrl = res.path;
-          }else{
-            this.$message.error({message: '图片上传失败!'});
+                let obj = {state: state};
 
-          }
-        },
-           //选择广告
-          selectAdv () {
-            this.showAdvModal = true;
-           // console.log(this.headerArray.splice(0,1));
-            this.getAdvList(0,1);
-          },
-        setAdvTop (data) {
-            const state = data.state == 0 ? 1 : 0;
-              if(data.state == 1){
-                  this.$messageBox.confirm('确定将这条广告删除？','提示',{
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        type: 'warning'
-                  }).then( () => {
-                    this.setAdvTopAjax(data,state);
-                  }).catch( () => {})
-              }else{
-                  this.setAdvTopAjax(data,state);
+                if(state == 0) {
+                    obj.publishState = 1;
+                }
+
+                 this.$http.get('/advertisement/getLists',{params:{pageNum: page || 1, pageSize: this.pageSize, obj: JSON.stringify(obj)}})
+                 .then( (res) =>{
+                    const msg = res.body;
+                    if(msg.result.success){
+                        if(state == 1){
+                          this.advLists = msg.result.data;
+                        }else{
+                            this.selectAdvLists = msg.result.data;
+                            this.tableTotalPage = msg.result.total;
+
+                          if(this.$refs.pagination){
+                              this.$refs.pagination.setPaginationData(page);
+                          }
+                        }
+                    }
+
+                 }, res => {
+                    this.$message.error({message: res.statusText });
+                 })
+            },
+            //保存设置背景图片
+            saveBgInfo () {
+
+              const url = this.bgObj.id != '' ? '/backgroundImg/update' : '/backgroundImg/insert'
+
+              if( this.bgObj.name != '' &&  this.bgObj.imgUrl != ''){
+                  this.$http.post(url,{obj:JSON.stringify(this.bgObj)})
+                 .then( res => {
+                     const msg = res.body
+                     if(msg.success){
+                        this.$message.success({
+                            message: '背景图片设置成功'
+                          });
+                        this.showBgModal = false;
+                        this.getBgLists();
+                        this.resetBgObj();
+                     }else{
+                      this.$message.error({
+                            message: '背景图片设置失败',
+                          });
+                     }
+                 }, res => {
+                  this.$message.error({message: res.statusText });
+               })
+              }else {
+
+               this.$message.error({
+                    message: '信息不完整'
+                  });
+
               }
-        },
-        setAdvTopAjax (data,state){
-             this.$http.post('/advertisement/updateState',{ids: data.id, state: state})
-             .then( res => {
-                 const msg = res.body
-                 if(msg.success){
-                 this.$message.success({message: data.state == 1 ? '移除成功' :'置顶成功!'});
+            },
+            //删除背景图片
+            deleteBgImg (obj) {
 
-                      //初始化读取首页广告列表
-                      this.getAdvList(1);
-                 }else{
-                    this.$message.error({message: msg.msg || '操作失败！'});
-                 }
-             }, res => {
-                this.$message.error({message: res.status+'-'+res.statusText });
-             })
-        },
-          //广告分页
-        getAdvPage (page) {
-            this.getAdvList(0,page);
-          },
-          //关闭广告模态框
-          closeAdvModal () {
-            this.showAdvModal = false;
-          }
+                this.$messageBox.confirm('确定要删除该图片？','提示',{
+                      confirmButtonText: '确定',
+                      cancelButtonText: '取消',
+                      type: 'warning'
+                }).then( () => {
+                      this.$http.post('/backgroundImg/delete',{id: obj.id})
+                     .then( res => {
+                         const msg = res.body
+                         if(msg.success){
+                            this.$message.success({
+                                message: '图片删除成功'
+                              });
+                            this.resetBgObj();
+                            this.getBgLists();
+                         }else{
+                           this.$message.error({
+                                message: '删除失败!'
+                              });
+                         }
+                     }, res => {
+                        this.$message.error({message: res.statusText });
+                     })
+                }).catch(() => {});
+            },
+            //显示背景图片上传模态
+            showBgUpload (obj) {
+              if(obj) {
+                  this.bgObj.name = obj.name;
+                  this.bgObj.id = obj.id;
+                  //this.bgObj.imgUrl = obj.imgUrl;
+              }
+              this.showBgModal = true;
+            },
+            //关闭设置背景图片模态框
+            closeBgUpload () {
+              this.showBgModal = false;
+              this.resetBgObj();
+            },
+            resetBgObj () {
+              this.bgObj.name = '';
+              this.bgObj.imgUrl = '';
+              this.bgObj.id = '';
+            },
+            //监听上传图片
+            bgImgUploaded (res){
+              if(res.success){
+                   this.bgObj.imgUrl = res.response.filePath;
+                   this.imgUrl = res.response.path;
+              }else {
+                  this.$message.error({message: '图片上传失败!'});
+              }
+
+            },
+             //选择广告
+            selectAdv () {
+              this.showAdvModal = true;
+              this.getAdvList(0,1);
+            },
+            //移除广告
+            setAdvTop (data) {
+                const state = data.state == 0 ? 1 : 0;
+                  if(data.state == 1){
+                      this.$messageBox.confirm('确定将这条广告删除？','提示',{
+                            confirmButtonText: '确定',
+                            cancelButtonText: '取消',
+                            type: 'warning'
+                      }).then( () => {
+                        this.setAdvTopAjax(data,state);
+                      }).catch( () => {})
+                  }else{
+                      this.setAdvTopAjax(data,state);
+                  }
+            },
+            setAdvTopAjax (data,state){
+                 this.$http.post('/advertisement/updateState',{ids: data.id, state: state})
+                 .then( res => {
+                     const msg = res.body
+                     if(msg.success){
+                     this.$message.success({message: data.state == 1 ? '移除成功' :'操作成功!'});
+
+                          //初始化读取首页广告列表
+                          this.getAdvList(1);
+                     }else{
+                        this.$message.error({message: msg.msg || '操作失败！'});
+                     }
+                 }, res => {
+                    this.$message.error({message: res.statusText });
+                 })
+            },
+            //广告分页
+            getAdvPage (page) {
+              this.getAdvList(0,page);
+            },
+            //关闭广告模态框
+            closeAdvModal () {
+              this.showAdvModal = false;
+            }
         }
 
     }

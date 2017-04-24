@@ -12,27 +12,29 @@ export default function (_this,file,component) {
         image.src = theFile.target.result;
         image.onload = function() {
           if(this.width != 900 || this.height != 500){
-            _this.$message.error({message:'图片尺寸错误：建议上传900px*500px'});
+            _this.$message.error({message:'图片尺寸错误：只能上传900px*500px'});
           }else{
             component.active = true;
           }
         };
       };
-   }
-    // else {
-  //     //ie9 选中图片时获取图片尺寸
-  //     var ipt = document.getElementById(''+file.el.id+'');
-  //     ipt.select();
-  //     ipt.blur();
-  //     var src = document.selection.createRange().text;
-  //     var img = document.getElementById('preview_size_fake');
-  //     img.filters.item('DXImageTransform.Microsoft.AlphaImageLoader').src = src;
-  //     // if(img.offsetWidth != 900 || img.offsetHeight != 500){
-  //     //   //_this.$message.error({message:'图片尺寸错误：建议上传900px*500px'});
-  //     // }else{
-  //     //   component.active = true;
-  //     // }
-  // }
+  }else {
+      //ie9 选中图片时获取图片尺寸
+      let ipt = document.getElementById(''+file.el.id+'');
+      ipt.select();
+      ipt.blur();
+      let src = document.selection.createRange().text;
+      let img = document.getElementById('preview_size_fake');
+      console.log(img.filters)
+    component.active = true;
+     // img.filters.item('DXImageTransform.Microsoft.AlphaImageLoader').src = src;
+
+      // if(img.offsetWidth != 900 || img.offsetHeight != 500){
+      //   //_this.$message.error({message:'图片尺寸错误：建议上传900px*500px'});
+      // }else{
+      //   component.active = true;
+      // }
+  }
 
 
 }

@@ -36,14 +36,14 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        include: [resolve('src'), resolve('test')]
+        include: [resolve('src'),resolve('assets'), resolve('test')]
       },
 
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
         loader: 'url-loader',
         query: {
-          limit: 10000,
+          limit: 20000,
           name: utils.assetsPath('img/[name].[hash:7].[ext]')
         }
       },

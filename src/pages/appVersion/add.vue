@@ -5,31 +5,20 @@
         <div slot="formBody" class="form-body">
 
           <dl class="dl2">
-            <dt>版本号：</dt>
-            <dd><input v-model="formObj.ver" class="ipt ipt-large"type="text"/></dd>
+            <dt>设备类型：</dt>
+            <dd>
+              <select v-model="formObj.deviceType" class="ipt ipt-medium">
+                <option value="GA">安卓</option>
+                <option value="AI">苹果</option>
+              </select>
+            </dd>
           </dl>
 
-          <dl class="dl2">
-            <dt>APK简介：</dt>
-            <dd><input  v-model="formObj.apkSynopsis" class="ipt ipt-large"type="text"/></dd>
-          </dl>
-          <dl class="dl2">
-            <dt>更新简介：</dt>
-            <dd><input  v-model="formObj.updateSynopsis" class="ipt ipt-large"type="text"/></dd>
-          </dl>
-          <dl class="dl2">
-            <dt>versionName：</dt>
-            <dd><input  v-model="formObj.versionName" class="ipt ipt-large"type="text"/></dd>
-          </dl>
-          <dl class="dl2">
-            <dt>versionCode：</dt>
-            <dd><input  v-model="formObj.versionCode" class="ipt ipt-large"type="text"/></dd>
-          </dl>
-          <dl class="dl2">
+          <dl class="dl2" v-if="formObj.deviceType == 'GA'">
             <dt>APK上传：</dt>
-            <dd>
+            <dd style="width:550px;">
               <div class="upload-area">
-                <span class="pull-left">{{fileName}}</span>
+                <span class="pull-left" style="margin-right:10px;">{{fileName}}</span>
                 <file-upload
                   class="upload-img-btn"
                   :post-action="uploadBtn.postAction"
@@ -44,23 +33,50 @@
                   :title="uploadBtn.title"
                   :events="uploadBtn.events"
                   v-on:fileUpload = "fileUpload"
+                  v-on:fileProgress = "fileProgress"
                 ></file-upload>
               </div>
+              <el-progress v-if="showProgress"  :percentage="progress"></el-progress>
             </dd>
           </dl>
+          <dl v-else class="dl2">
+            <dt>appStore地址:</dt>
+            <dd><input  v-model="formObj.appStoreUrl" placeholder="请输入app商店地址" class="ipt ipt-large" type="text"/></dd>
+          </dl>
+          <dl class="dl2">
+            <dt>版本名称：</dt>
+            <dd v-if="formObj.deviceType == 'GA'"><input  v-model="formObj.versionName" class="ipt ipt-large disabled"  type="text" readonly/></dd>
+            <dd v-else><input  v-model="formObj.iosVersionName" class="ipt ipt-large"  type="text"/></dd>
 
-
+          </dl>
+          <dl class="dl2">
+            <dt>版本Code：</dt>
+            <dd  v-if="formObj.deviceType == 'GA'"><input  v-model="formObj.versionCode" class="ipt ipt-large disabled" type="text" readonly/></dd>
+            <dd  v-else><input  v-model="formObj.iosVersionCode" class="ipt ipt-large" type="text"/></dd>
+          </dl>
+          <dl class="dl2">
+            <dt>是否强制更新:</dt>
+            <dd>
+              <select v-model="formObj.isForceUpgrade" class="ipt ipt-medium">
+                <option value="0">否</option>
+                <option value="1">是</option>
+              </select>
+            </dd>
+          </dl>
+          <dl class="dl2">
+            <dt>APP简介：</dt>
+            <dd><input  v-model="formObj.apkSynopsis" class="ipt ipt-large" type="text"/></dd>
+          </dl>
+          <dl class="dl2">
+            <dt>更新简介：</dt>
+            <dd><input  v-model="formObj.updateSynopsis" class="ipt ipt-large" type="text"/></dd>
+          </dl>
         </div>
 
       </add-form>
     </div>
 </template>
 <style lang="less" scoped>
- .upload-area{
-
-   line-height:36px;
-
- }
 </style>
 <script>
 import addForm from '../../components/addForm'
@@ -69,19 +85,26 @@ import FileUpload from 'vue-upload-component'
         data(){
             return{
                fileName: '',
+               progress: 0,
+               showProgress: false,
                 formObj: {
-                    ver: '',
+                    deviceType: 'GA',
                     updateSynopsis: '',
                     apkSynopsis: '',
                     filePath: '',
                     versionName: '',
                     versionCode: '',
+                    appStoreUrl: '',
+                    increasePath: '',
+                    iosVersionName: '',
+                    iosVersionCode: '',
+                    isForceUpgrade: 0
                 },
                 uploadBtn: {
                     accept: '',
-                    size: 1024 * 1024 * 10,
+                    size: 1024 * 1024 * 50,
                     multiple: false,
-                    extensions: '',
+                    extensions: 'apk',
                     files: [],
                     upload: {},
                     title: '上传文件',
@@ -93,17 +116,20 @@ import FileUpload from 'vue-upload-component'
                     postAction: '/file/upload',
                     events: {
                         add(file, component) {
-
+                           if(file.file.name.lastIndexOf('.apk') < 0){
+                              this.$message.error({message:'请选择apk文件！'});
+                              return;
+                           }
                             component.active = true;
                             file.headers['X-Filename'] = encodeURIComponent(file.name)
                             file.data.finename = file.name
 
                           },
                           progress(file, component) {
-
+                               this.$emit('fileProgress',file.progress)
                           },
                           after(file, component) {
-                            this.$emit('fileUpload',file)
+                              this.$emit('fileUpload',file)
                           },
                           before(file, component) {
 
@@ -118,36 +144,73 @@ import FileUpload from 'vue-upload-component'
         },
         methods: {
           save () {
-            console.log(this.formObj)
-            if(this.formObj.ver == '' || this.formObj.updateSynopsis == '' || this.formObj.apkSynopsis == '' || this.formObj.filePath == '') {
-                this.$message.error({message: '信息不完整!' });
+
+            if(this.formObj.deviceType == 'GA'){
+                if(this.formObj.filePath == ''){
+                    this.$message.error({message: '请上传apk文件!' });
+                    return;
+                }
+            }else{
+                if(this.formObj.appStoreUrl == '' ){
+                    this.$message.error({message: '请输入app商店地址!' });
+                    return;
+                }else if(this.formObj.iosVersionName == '' ){
+                    this.$message.error({message: '请输入版本名称!' });
+                    return;
+                }else if(this.formObj.iosVersionCode == '' ) {
+                    this.$message.error({message: '请输入版本code!' });
+                    return;
+                }
+            }
+
+            if(this.formObj.updateSynopsis == '' || this.formObj.updateSynopsis == '' ) {
+                this.$message.error({message: '请填写app简介和更新简介!' });
                 return;
             }
 
-           this.$http.post('/api/apkVersion/insert',{obj:JSON.stringify(this.formObj)})
-           .then( res => {
-              const msg = res.body
-              if(msg.success){
-                 this.$message.success({message: '保存成功!' });
+            if(this.formObj.deviceType == 'GA'){
+                this.formObj.appStoreUrl = '';
+            }else{
+                this.formObj.filePath = '';
+                this.formObj.increasePath = '';
+            }
 
-                this.$router.replace('/appVersion');
-              }else{
-               this.$message.error({message: '保存失败!' });
-              }
-           }, res => {
-                this.$message.error({message: res.status+'-'+res.statusText });
+
+             this.$http.post('/api/apkVersion/insert',{obj:JSON.stringify(this.formObj)})
+             .then( res => {
+                const msg = res.body
+                if(msg.success){
+                   this.$message.success({message: '保存成功!' });
+
+                  this.$router.replace('/appVersion');
+                }else{
+                 this.$message.error({message: '保存失败!' });
+                }
+             }, res => {
+                this.$message.error({message: res.statusText });
              })
 
           },
           fileUpload (file) {
 
-           if(file.response.filePath){
-                this.formObj.filePath = file.response.filePath;
-                this.fileName = file.file.name;
-            }else{
-                this.$message.error({message: 'apk上传失败，请重新上传！' });
-            }
+               if(file.response.success){
 
+                  this.formObj.filePath = file.response.filePath;
+                  this.formObj.increasePath = file.response.increasePath;
+                  this.formObj.versionCode = file.response.versionCode;
+                  this.formObj.versionName = file.response.versionName;
+                  this.fileName = file.file.name;
+
+               }else{
+                    this.$message.error({message: file.response.msg || '上传失败！' });
+               }
+
+               this.showProgress = false;
+
+          },
+          fileProgress (p) {
+              this.showProgress = true;
+              this.progress = Number(p);
           }
 
 

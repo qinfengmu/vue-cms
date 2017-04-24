@@ -77,10 +77,10 @@ import pagination from '../../components/pagination'
                 opTime: ''
               },
               headerArray: [
-              {name: '版本号',width:'20%'},
-              {name: '版本描述', width:'20%'},
+              {name: '版本号',width:'25%'},
+              {name: '版本描述', width:'25%'},
               {name: '上传人'},
-              {name: '上传时间'},
+              {name: '上传时间' ,width:'20%'},
               {name: '操作',width:'10%'},
              ],
              tableTotalPage:0,
@@ -127,7 +127,7 @@ import pagination from '../../components/pagination'
               }
 
            }, res => {
-              this.$message.error({message: res.status+'-'+res.statusText });
+              this.$message.error({message: res.statusText });
            })
         },
         getStartTime (time) {

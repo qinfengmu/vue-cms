@@ -6,13 +6,17 @@
           <dt>商户名称：</dt>
           <dd class="default">{{data.name}}</dd>
         </dl>
-        <dl>
-          <dt>广告分类：</dt>
-          <dd class="default">{{data.type}}</dd>
-        </dl>
+        <!--<dl>-->
+          <!--<dt>广告分类：</dt>-->
+          <!--<dd class="default">{{data.type}}</dd>-->
+        <!--</dl>-->
         <dl>
           <dt>广告描述：</dt>
-          <dd class="default">{{data.adDescribe}}</dd>
+          <dd class="default">{{data.info}}</dd>
+        </dl>
+        <dl>
+          <dt>广告地址：</dt>
+          <dd class="default">{{data.url}}</dd>
         </dl>
         <dl>
           <dt>展示图片：</dt>
@@ -72,7 +76,7 @@ import addForm from '../../components/addForm'
                 }
 
              }, res => {
-                this.$message.error({message: res.status+'-'+res.statusText });
+                this.$message.error({message: res.statusText });
              })
           },
 

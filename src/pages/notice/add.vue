@@ -21,9 +21,9 @@
           <dt><input value="0" v-model="formObj.type" @change="setContentType" type="radio" id="urlRd"><label
             for="urlRd">内容页链接</label></dt>
           <dd>
-            <input v-model="formObj.url" :readonly="formObj.type==1" class="ipt ipt-large"
+            <input v-model="formObj.url" :readonly="formObj.type==1" placeholder="例如：http://xxx.xxx.xxx" class="ipt ipt-large"
                    :class="{ disabled : formObj.type==1 }" type="text"/>
-            <p class="nreq">*非必填</p>
+            <!--<p class="nreq">*非必填</p>-->
           </dd>
         </dl>
         <dl class="dl2">
@@ -59,18 +59,19 @@
           </dd>
         </dl>
         <dl class="dl2">
-          <dt>发布定时：</dt>
+          <dt>发布时间：</dt>
           <dd>
             <ul class="radio-list">
               <li><input type="radio" v-model="formObj.publishType" value="0" @change="setPublishTime" id="send1"><label
-                for="send1">立即推送</label></li>
-              <li><input type="radio" v-model="formObj.publishType" value="1" id="send2"><label for="send2">定时推送</label>
+                for="send1">立即发布</label></li>
+              <li><input type="radio" v-model="formObj.publishType" value="1" id="send2"><label for="send2">定时发布</label>
               </li>
             </ul>
             <div v-if="formObj.publishType == 1" class="showTime">
               <el-date-picker
                 v-model="formObj.publishTime"
                 type="datetime"
+                :picker-options="pickerOptions"
                 placeholder="选择发布时间">
               </el-date-picker>
               <input v-model.number="formObj.publishReceiveTime" class="ipt ipt-small"><span>小时内在线设备可以接收到消息</span>
@@ -79,7 +80,7 @@
           </dd>
         </dl>
         <dl class="dl2">
-          <dt>下线定时：</dt>
+          <dt>下线时间：</dt>
           <dd>
             <ul class="radio-list">
               <li><input type="radio" v-model="formObj.offType" value="0" @change="setOffTime"
@@ -91,6 +92,7 @@
               <el-date-picker
                 v-model="formObj.offTime"
                 type="datetime"
+                :picker-options="pickerOptions"
                 placeholder="选择下线时间">
               </el-date-picker>
             </div>
@@ -108,6 +110,10 @@
           </dd>
         </dl>
 
+      </div>
+      <div  class="button-area" slot="buttonArea">
+        <button type="submit" class="btn btn-blue">发布</button>
+        <router-link to="/notice" class="btn btn-red" replace>取消</router-link>
       </div>
 
     </add-form>
@@ -139,11 +145,17 @@
 <script>
 import addForm from '../../components/addForm'
 import uiTable from '../../components/uiTable'
+import patterns from '../../util/patterns'
 import FileUpload from 'vue-upload-component'
     export default{
         data(){
             return{
                 myEditor:'myEditor',
+                pickerOptions: {
+                  disabledDate(time) {
+                    return time.getTime() < new Date().getTime() - 8.64e7 ;
+                  }
+                },
                 formObj: {
                     title: '',
                     imgUrl: '',
@@ -173,10 +185,6 @@ import FileUpload from 'vue-upload-component'
 
                 ],
                 imgUrl: '',
-                picked: 1,
-                offLinePicked: 1,
-                actionPiked: 1,
-                sendTimePicked: 1,
                 uploadBtn: {
                     accept: 'image/jpg,image/jpeg,image/png',
                     size: 1024 * 1024 * 10,
@@ -198,17 +206,14 @@ import FileUpload from 'vue-upload-component'
                             file.data.finename = file.name
                           },
                           progress(file, component) {
-                           // console.log('progress ' + file.progress);
                           },
                           after(file, component) {
                             this.$emit('fileUpload',file.response);
-                           // console.log('after');
                           },
                           before(file, component) {
-                            //console.log('before');
                           }
                     }
-                  }
+                }
             }
         },
         components:{
@@ -229,23 +234,57 @@ import FileUpload from 'vue-upload-component'
            }
         },
         methods: {
-
           save () {
-           const url = this.isEdit ? '/api/notice/update' : '/api/notice/insert';
-           this.$http.post(url,{obj:JSON.stringify(this.formObj)})
-           .then( res => {
-               const msg = res.body
-               if(msg.success){
-                   this.$message.success({message: '操作成功!'});
-                   this.$router.replace('/notice');
-               }else{
-                  this.$message.error({message: '操作失败!' });
-               }
 
-           }, res => {
-              this.$message.error({message: res.status+'-'+res.statusText });
-           })
+                if(this.formObj.title == ''){
+                    this.$message.error({message: '请输入标题!' });
+                    return;
+                }else if(this.formObj.type == 0 && this.formObj.url == ''){
+                    this.$message.error({message: '请输入内容页链接!' });
+                    return;
+                }else if(this.formObj.type == 1 && this.formObj.content == ''){
+                    this.$message.error({message: '请输入文本内容!' });
+                    return;
+                }else if(this.formObj.imgUrl == ''){
+                    this.$message.error({message: '请上传图片!' });
+                    return;
+                }else if(this.formObj.publishType == 1 && this.formObj.publishTime == ''){
+                    this.$message.error({message: '请选择发布时间!' });
+                    return;
+                }else if(this.formObj.offType == 1 && this.formObj.offTime == ''){
+                    this.$message.error({message: '请选择下线时间!' });
+                    return;
+                }
 
+                if(this.formObj.publishType == 1 && this.formObj.offType == 1){
+                    if(this.formObj.offTime < this.formObj.publishTime){
+                      this.$message.error({message: '下线时间不能早于发布时间!' });
+                      return;
+                    }
+                }
+
+                if(this.formObj.type == 0 && this.formObj.url != '' && !patterns.url(this.formObj.url)){
+                    this.$message.error({message: '内容页链接格式不正确，请重新输入!' });
+                    return;
+                }
+
+
+               this.formObj.publishTime = new Date(this.formObj.publishTime).getTime();
+               this.formObj.offTime = new Date(this.formObj.offTime).getTime();
+               const url = this.isEdit ? '/api/notice/update' : '/api/notice/insert';
+               this.$http.post(url,{obj:JSON.stringify(this.formObj)})
+               .then( res => {
+                   const msg = res.body
+                   if(msg.success){
+                       this.$message.success({message: '操作成功!'});
+                       this.$router.replace('/notice');
+                   }else{
+                      this.$message.error({message: '操作失败!' });
+                   }
+
+               }, res => {
+                  this.$message.error({message: res.statusText });
+               })
           },
           getDetail () {
              this.$http.get('/api/notice/view',{params:{id: this.$route.params.id}})
@@ -257,7 +296,7 @@ import FileUpload from 'vue-upload-component'
                     this.$message.error({message: '公告不存在或已被删除!'});
                   }
              }, res => {
-                this.$message.error({message: res.status+'-'+res.statusText });
+                this.$message.error({message: res.statusText });
              })
           },
           setContentType () {
