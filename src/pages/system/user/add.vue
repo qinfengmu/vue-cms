@@ -1,5 +1,5 @@
 <template>
-      <add-form  class="w700" :isForm="true" v-on:formSubmit="save">
+      <add-form  class="w705" :isForm="true" v-on:formSubmit="save">
 
         <div slot="formBody" class="form-body">
 
@@ -112,22 +112,7 @@
                     this.$message.error({message: res.statusText });
                  })
 
-            },
-
-            getView () {
-                 const id = this.$route.params.id || "";
-                 this.$http.get('/api/user/view',{params:{id: id}})
-                 .then( (res) =>{
-                    const msg = res.body;
-                    if(msg.success){
-                        this.formObj = msg.result;
-                    }else{
-                        this.$message.error({ message: '用户信息不存在！' });
-                    }
-                 }, res => {
-                    this.$message.error({message: res.statusText });
-                 })
-            },
+            }
 
         }
     }

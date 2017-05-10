@@ -4,11 +4,8 @@
         <ul>
           <li>当前位置：</li>
           <li v-for="(router,index) in routerList">
-
-            <router-link v-if="index !== 0" :to="router.path || '/'"><em v-if="index > 1 && router.meta.text!=''">></em>{{router.meta.text}}</router-link>
-
+            <router-link v-if="index > 0" :to="router.path || '/'"><em v-if="index > 1 && router.meta.text!=''">></em>{{router.meta.text}}</router-link>
           </li>
-
         </ul>
 
     </div>

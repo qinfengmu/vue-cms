@@ -1,6 +1,6 @@
 <template>
 
-    <add-form class="w700">
+    <add-form class="w705">
       <div slot="detail">
         <dl>
           <dt>消息描述：</dt>

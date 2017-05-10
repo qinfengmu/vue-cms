@@ -8,11 +8,13 @@ import router from './router'
 import './iconfont/iconfont.css'
 import './css/bootstrap/css/bootstrap.min.css'
 import './filter'
+import './directive'
 import './elementUi'
 import  './less/common.less'
 import  components from './components'
 import  VueValidator from 'vue-validator'
 import { Loading } from 'element-ui'
+import _ from 'lodash'
 
 //Vue.config.productionTip = false
 
@@ -26,21 +28,33 @@ Object.keys(components).forEach((key) => {
 
 });
 
-//页面登录权限控制，默认需要登录
-router.beforeEach(({meta,path},from,next) => {
-
-    let {auth = true } = meta;
-    let isLogin = typeof(stores.state.User.userId) != 'undefined' ? true : false;
-    if(auth && !isLogin && path !=='/login'){
-      return next({path:'/login'});
-    }
-
-    if(isLogin && path == '/login'){
-      return next({path:'/'});
-    }
-
-    next();
+//获取权限
+Vue.http.get('/api/login/getAuthElements')
+  .then(res =>{
+  const msg = res.body;
+  if(msg.elements){
+    stores.dispatch('setElements',msg.elements);
+    //页面登录权限控制，默认需要登录
+    router.beforeEach(({meta,path},from,next) => {
+        let {auth = true } = meta;
+        let isLogin = typeof(stores.state.User.userId) != 'undefined' ? true : false;
+        if(meta.code != 'noNeedPermission' && !_.find(stores.state.permission.elements,{code:meta.code})){
+          return next({path:'/authorization'});
+        }
+        if(auth && !isLogin && path !=='/login'){
+          return next({path:'/login'});
+        }
+        if(isLogin && path == '/login'){
+          return next({path:'/'});
+        }
+        next();
+    })
+  }else{
+    router.replace('/login');
+  }
 })
+
+
 //面包屑导航值保存到vuex中
 router.afterEach( router => {
   stores.commit('setBreadCrumbs',router.matched);
@@ -54,10 +68,9 @@ new Vue({
 
 //拦截器
 Vue.http.options.emulateJSON = true;
-Vue.http.interceptors.push( (request, next) => {
-
+Vue.http.interceptors.push( function(request, next)  {
   let text = "正在加载...";
-
+  const showLoading = stores.state.loading.showLoading;
   if(request.method.toUpperCase() == 'POST') {
     text = '正在提交...';
   }
@@ -66,23 +79,27 @@ Vue.http.interceptors.push( (request, next) => {
     text = stores.state.loading.text;
   }
   //全局加载提示
-  let loadingInstance = Loading.service({
+  if(showLoading){
+    var loadingInstance = Loading.service({
       body: false,
       fullscreen: true,
       text:text,
       lock: false,
       customClass:'ui-loading'
-  });
-
+    });
+  }
   setTimeout(function () {
       next((response) => {
         //从vuex取出状态文本
         const statusText = stores.state.responseStatus[response.status];
         //关闭加载
-        loadingInstance.close();
+        if(showLoading){
+          loadingInstance.close();
+        }
         //重置提示文本
         text = "正在加载...";
         stores.dispatch('setLoadingText','');
+        stores.dispatch('setShowLoading',true);
 
         response.statusText = typeof(statusText) != 'undefined' ? statusText : response.statusText;
 
@@ -99,3 +116,5 @@ Vue.http.interceptors.push( (request, next) => {
   },500)
 
 })
+
+

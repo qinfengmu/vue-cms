@@ -13,8 +13,9 @@
           <tr v-for="(data, index) in versionLists">
             <td>{{index+1}}</td>
             <td>{{data.ver}}</td>
+            <td>{{data.verName}}</td>
             <td>{{data.verInfo}}</td>
-            <td><span class="blueColor">{{data.packSize}}</span></td>
+            <td><span class="blueColor">{{data.packSize | storageUnit('KB')}}</span></td>
             <td>{{data.commitTime | date('YYYY-MM-DD HH:mm:ss')}}</td>
             <td class="action-td">
               <router-link class="blue-fontIcon" title="查看详情" :to="{ name: 'lineDetail', params: { id: data.id }}"><i class="iconfont icon-info"></i></router-link>
@@ -36,7 +37,7 @@
           <tbody slot="tbody">
           <tr v-for="(data,index) in draftVersionLists">
             <td>{{index+1}}</td>
-            <td>{{data.ver}}</td>
+            <td>{{data.verName}}</td>
             <td>{{data.verInfo}}</td>
             <td>{{data.commitTime | date('YYYY-MM-DD HH:mm:ss')}}</td>
             <td class="action-td">
@@ -80,6 +81,7 @@
             headerArray:[
                 {name: '版本序号',width:'10%'},
                 {name: '版本号',width: '15%'},
+                {name: '版本名称',width: '15%'},
                 {name: '版本描述'},
                 {name: '数据包大小'},
                 {name: '提交时间' ,width: '20%'},
@@ -96,7 +98,7 @@
         },
         computed: {
             draftHeaderArray () {
-              return   _.reject(this.headerArray,{name: '数据包大小'});
+              return   _.reject(_.reject(this.headerArray,{name: '数据包大小'}),{name: '版本号'});
             }
         },
         created (){

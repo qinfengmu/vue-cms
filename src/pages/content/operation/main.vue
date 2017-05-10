@@ -12,8 +12,8 @@
             <dd>
               <select class="f-input" v-model="searchObj.state">
                 <option value="">全部</option>
-                <option value="0">不可见</option>
-                <option value="1">可见</option>
+                <option value="false">不可见</option>
+                <option value="true">可见</option>
               </select>
             </dd>
             </dl>
@@ -34,7 +34,7 @@
         <ui-table :headerArray="headerArray" :style="{minHeight:tableMinHeight}">
             <tbody slot="tbody">
               <tr v-for="data in tableData">
-                <td><img :src="data.imgPath" height="55" width="99"></td>
+                <td><img :src="data.imgUrl" height="55" width="99"></td>
                 <td>{{data.title}}</td>
                 <td>{{data.sourceInfo}}</td>
                 <td>{{data.author}}</td>
@@ -50,7 +50,10 @@
                     @change="switchChange(data)">
                   </el-switch>
                 </td>
-                <td><router-link class="blue-fontIcon" title="查看详情" :to="{ name: 'operationDetail', params: { id: data.id }}"><i class="iconfont icon-info"></i></router-link></td>
+                <td class="action-td">
+                  <router-link class="blue-fontIcon" title="编辑" :to="{ name: 'editOperation', params: { id: data.id }}"><i class="iconfont icon-modify"></i></router-link>
+                  <router-link class="blue-fontIcon" title="查看详情" :to="{ name: 'operationDetail', params: { id: data.id }}"><i class="iconfont icon-info"></i></router-link>
+                </td>
               </tr>
               <tr v-if="tableData == ''" class="text-center">
                   <td colspan="7">无数据</td>
@@ -73,7 +76,6 @@ import pagination from '../../../components/pagination'
   export default{
       data(){
           return{
-              checkedNames: [],
               searchObj: {
                 publishTime: '',
                 title: '',
@@ -103,12 +105,7 @@ import pagination from '../../../components/pagination'
       computed: {
 
           tableMinHeight () {
-
             return 42*(this.pageSize+1)+'px';
-
-          },
-         value2 () {
-              return false;
           }
       },
       components:{
@@ -127,13 +124,15 @@ import pagination from '../../../components/pagination'
          this.$http.get('/api/serviceDynamic/getLists',{params:{pageNum: page, pageSize: this.pageSize, obj: JSON.stringify(searchObj)}})
            .then( (res) =>{
               const msg = res.body;
-              if(msg.result.success){
-                this.tableData = msg.result.data;
-                this.tableTotalPage = msg.result.total;
+              if(msg.success){
+                  this.tableData = msg.result.data;
+                  this.tableTotalPage = msg.result.total;
 
-                if(this.$refs.pagination){
-                    this.$refs.pagination.setPaginationData(page);
-                }
+                  if(this.$refs.pagination){
+                      this.$refs.pagination.setPaginationData(page);
+                  }
+              }else{
+                 this.$message.error({message: '查询失败!' });
               }
 
            }, res => {

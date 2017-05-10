@@ -1,10 +1,10 @@
 <template>
-      <add-form class="w700" :isForm="true" v-on:formSubmit="save">
+      <add-form class="w705" :isForm="true" v-on:formSubmit="save">
 
         <div slot="formBody" class="form-body">
 
           <dl>
-            <dt>版本号：</dt>
+            <dt>版本名称：</dt>
             <dd><input v-model="formObj.version" class="ipt ipt-large"type="text"/></dd>
           </dl>
 

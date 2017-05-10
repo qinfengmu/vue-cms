@@ -8,7 +8,6 @@
         <div class="content-inner">
           <bread-crumbs></bread-crumbs>
           <router-view></router-view>
-
         </div>
     </div>
   </div>
@@ -22,7 +21,7 @@ import breadCrumbs from './components/breadCrumbs'
             }
         },
 
-  components: { breadCrumbs }
+        components: { breadCrumbs }
 
     }
 </script>

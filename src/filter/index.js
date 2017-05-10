@@ -36,3 +36,25 @@ Vue.filter('messageAfterOpen', (state) => {
 return textArr[state] ? textArr[state] : '';
 
 })
+
+/*内容管理分类信息*/
+Vue.filter('classifyTxt', (state,textArr) => {
+
+  return textArr[state-1] ? textArr[state-1].name : '';
+
+})
+
+Vue.filter('storageUnit', (state,unit) => {
+  if(unit && state) {
+    unit = unit.toUpperCase();
+    switch (unit) {
+      case 'KB':
+          return (state/1024).toFixed(2)+unit;
+        break;
+      case 'MB':
+        return (state/1024/1024).toFixed(2)+unit;
+      break;
+    }
+  }
+
+})

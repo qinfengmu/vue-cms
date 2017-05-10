@@ -1,5 +1,5 @@
 <template>
-      <add-form  class="w700" :isForm="true" v-on:formSubmit="save">
+      <add-form  class="w705" :isForm="true" v-on:formSubmit="save">
 
         <div slot="formBody" class="form-body">
 
@@ -30,7 +30,7 @@
             <dt>展示图片：</dt>
             <dd>
               <div class="upload-area">
-                <img v-if="formObj.imgUrl" width="198" height="110" :src="imgUrl">
+                <img v-if="formObj.imgPath" width="198" height="110" :src="imgUrl">
                 <file-upload
                   class="upload-img-btn"
                   :post-action="uploadBtn.postAction"
@@ -149,7 +149,7 @@ import patterns from '../../util/patterns'
                     name: '',
                     //type: '1',
                     info: '',
-                    imgUrl: '',
+                    imgPath: '',
                     url: '',
                     publishType: 0,
                     publishTime: '',
@@ -205,7 +205,7 @@ import patterns from '../../util/patterns'
 
             save () {
 
-                if(this.formObj.name == '' || this.formObj.info == '' || this.formObj.url == '' ||  this.formObj.imgUrl == ''){
+                if(this.formObj.name == '' || this.formObj.info == '' || this.formObj.url == '' ||  this.formObj.imgPath == ''){
                      this.$message.error({ message: '信息不完整！'});
                      return;
                 }
@@ -221,15 +221,21 @@ import patterns from '../../util/patterns'
                 }
 
                 if(this.formObj.publishType == 1 && this.formObj.publishTime != '' && this.formObj.offTime != ''){
-                       this.$message.error({ message: '下线时间不能早于发布时间！'});
-                       return;
+                       if(this.formObj.offTime < this.formObj.publishTime){
+                          this.$message.error({ message: '下线时间不能早于发布时间！'});
+                          return;
+                       }
                 }
-
 
                 this.formObj.publishTime = new Date(this.formObj.publishTime).getTime();
                 this.formObj.offTime = new Date(this.formObj.offTime).getTime();
 
-                this.$http.post('/advertisement/insert',{obj:JSON.stringify(this.formObj)})
+                if( typeof this.formObj.offTime != 'undefined' && this.formObj.offTime < new Date().getTime()){
+                      this.$message.error({message: '下线时间不能早于当前时间!' });
+                      return;
+                }
+
+                this.$http.post('/api/advertisement/insert',{obj:JSON.stringify(this.formObj)})
                  .then( res => {
                      const msg = res.body
                      if(msg.result.success){
@@ -250,7 +256,7 @@ import patterns from '../../util/patterns'
             },
             fileUpload (res) {
                 if(res.filePath){
-                    this.formObj.imgUrl = res.filePath;
+                    this.formObj.imgPath = res.filePath;
                     this.imgUrl = res.path;
                 }else{
                     this.$message.error({

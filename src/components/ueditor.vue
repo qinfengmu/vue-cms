@@ -35,12 +35,12 @@
         }
       }
     },
-    beforeDestroy () {
-        //组件销毁时销毁ueditor实例
-        if(this.editor && this.editor.destroy){
-          this.editor.destroy();
-        }
-    },
+    //beforeDestroy () {
+    //    //组件销毁时销毁ueditor实例
+    //    if(this.editor && this.editor.destroy){
+    //      this.editor.destroy();
+    //    }
+    //},
     mounted() {
       this.$nextTick(function f1() {
         // 保证 this.$el 已经插入文档

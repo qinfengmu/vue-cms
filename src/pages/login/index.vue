@@ -122,6 +122,7 @@
                      var result = res.body;
                      if(result.success){
                          this.signIn(result.user);
+                         this.setElements(result.elements);
                          this.$message.success({message: '登录成功！' });
                          this.$router.replace('/');
                      }else{
@@ -137,7 +138,7 @@
              changeSrc (obj) {
                 this.changeVerify();
              },
-             ...mapActions(['signIn','setLoadingText','changeVerify'])
+             ...mapActions(['signIn','setLoadingText','changeVerify','setElements'])
         }
 
     }

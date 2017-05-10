@@ -55,7 +55,7 @@
                 <td><span class="count">{{data.clicks}}</span></td>
                 <td>{{data.publishTime | date('YYYY-MM-DD HH:mm:ss')}}</td>
                 <td>{{data.offTime | date('YYYY-MM-DD HH:mm:ss')}}</td>
-                <td><a class="delete-btn" href @click.prevent="setAdvTop(data)"><i class="iconfont icon-delete"></i></a></td>
+                <td><a class="delete-btn" href @click.prevent="setAdvTop(data)"><i class="iconfont icon-delete fz20"></i></a></td>
               </tr>
               <tr v-if="advLists == ''" class="text-center">
                 <td colspan="8">无数据</td>
@@ -86,7 +86,7 @@
 
                   <div class="upload-area">
 
-                    <img v-if="bgObj.imgUrl" width="198" height="110" :src="imgUrl">
+                    <img v-if="bgObj.imgPath" width="198" height="110" :src="imgUrl">
                           <file-upload
                           class="upload-img-btn"
                           :post-action="uploadBtn.postAction"
@@ -306,7 +306,7 @@
             bgObj: {
               id: '',
               name: '',
-              imgUrl: ''
+              imgPath: ''
             },
 
             headerArray:[
@@ -384,33 +384,9 @@
 
         },
         methods: {
-            cg () {
-
-                if( typeof (FileReader) != 'undefined'){
-                    var MyTest = document.getElementById("upload_img").files[0];
-                    var reader = new FileReader();
-                    reader.readAsDataURL(MyTest);
-                    reader.onload = function(theFile) {
-                      var image = new Image();
-                       image.src = theFile.target.result;
-                       image.onload = function() {
-                          alert("图片的宽度为"+this.width+",长度为"+this.height);
-                       };
-                    };
-                }else{
-                    var ipt = document.getElementById('upload_img')
-                    ipt.select();
-                    ipt.blur();
-                    var src = document.selection.createRange().text;
-                    var img = document.getElementById('preview_size_fake');
-                    console.log(img.filters)
-                    img.filters.item('DXImageTransform.Microsoft.AlphaImageLoader').src = src;
-                    console.log(img.offsetWidth)
-                }
-            },
             //定义初始化读取背景图片列表信息
             getBgLists () {
-              this.$http.get('/backgroundImg/getLists')
+              this.$http.get('/api/backgroundImg/getLists')
                .then( res => {
                    const msg = res.body
                    this.BgLists = msg.result;
@@ -420,7 +396,7 @@
             },
             //定义初始化读取功能配置
             getActionLists () {
-              this.$http.get('/homeFunction/getLists')
+              this.$http.get('/api/homeFunction/getLists')
                .then( res => {
                    const msg = res.body
                    this.actionLists = msg.result;
@@ -433,7 +409,7 @@
 
                const actionList = this.actionLists.map ( action => _.pick(action,['id','state']) )
 
-                this.$http.post('/homeFunction/updateState',{obj: JSON.stringify(actionList)})
+                this.$http.post('/api/homeFunction/updateState',{obj: JSON.stringify(actionList)})
                    .then( res => {
                        const msg = res.body
                        if(msg.success){
@@ -457,7 +433,7 @@
                     obj.publishState = 1;
                 }
 
-                 this.$http.get('/advertisement/getLists',{params:{pageNum: page || 1, pageSize: this.pageSize, obj: JSON.stringify(obj)}})
+                 this.$http.get('/api/advertisement/getLists',{params:{pageNum: page || 1, pageSize: this.pageSize, obj: JSON.stringify(obj)}})
                  .then( (res) =>{
                     const msg = res.body;
                     if(msg.result.success){
@@ -480,9 +456,9 @@
             //保存设置背景图片
             saveBgInfo () {
 
-              const url = this.bgObj.id != '' ? '/backgroundImg/update' : '/backgroundImg/insert'
+              const url = this.bgObj.id != '' ? '/api/backgroundImg/update' : '/api/backgroundImg/insert'
 
-              if( this.bgObj.name != '' &&  this.bgObj.imgUrl != ''){
+              if( this.bgObj.name != '' &&  this.bgObj.imgPath != ''){
                   this.$http.post(url,{obj:JSON.stringify(this.bgObj)})
                  .then( res => {
                      const msg = res.body
@@ -517,7 +493,7 @@
                       cancelButtonText: '取消',
                       type: 'warning'
                 }).then( () => {
-                      this.$http.post('/backgroundImg/delete',{id: obj.id})
+                      this.$http.post('/api/backgroundImg/delete',{id: obj.id})
                      .then( res => {
                          const msg = res.body
                          if(msg.success){
@@ -539,26 +515,30 @@
             //显示背景图片上传模态
             showBgUpload (obj) {
               if(obj) {
-                  this.bgObj.name = obj.name;
-                  this.bgObj.id = obj.id;
-                  //this.bgObj.imgUrl = obj.imgUrl;
+                 this.bgObj.id = obj.id;
+                 this.bgObj.name = obj.name;
+                 this.bgObj.imgPath = obj.imgPath;
+                 this.imgUrl = obj.imgUrl;
+              }else{
+                this.resetBgObj();
               }
               this.showBgModal = true;
             },
             //关闭设置背景图片模态框
             closeBgUpload () {
               this.showBgModal = false;
-              this.resetBgObj();
+              //this.resetBgObj();
             },
             resetBgObj () {
               this.bgObj.name = '';
-              this.bgObj.imgUrl = '';
+              this.bgObj.imgPath = '';
               this.bgObj.id = '';
+              this.imgUrl = '';
             },
             //监听上传图片
             bgImgUploaded (res){
               if(res.success){
-                   this.bgObj.imgUrl = res.response.filePath;
+                   this.bgObj.imgPath = res.response.filePath;
                    this.imgUrl = res.response.path;
               }else {
                   this.$message.error({message: '图片上传失败!'});
@@ -586,7 +566,7 @@
                   }
             },
             setAdvTopAjax (data,state){
-                 this.$http.post('/advertisement/updateState',{ids: data.id, state: state})
+                 this.$http.post('/api/advertisement/updateState',{ids: data.id, state: state})
                  .then( res => {
                      const msg = res.body
                      if(msg.success){

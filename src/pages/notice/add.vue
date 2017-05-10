@@ -1,5 +1,5 @@
 <template>
-    <add-form class="w700" :isForm="true" v-on:formSubmit="save">
+    <add-form class="w705" :isForm="true" v-on:formSubmit="save">
 
       <ui-table v-if="isEdit" class="mb20" slot="other" :headerArray="headerArray">
         <tbody slot="tbody">
@@ -39,7 +39,7 @@
           <dt>封面图片：</dt>
           <dd>
             <div class="upload-area">
-              <img v-if="formObj.imgUrl" width="198" height="110" :src="imgUrl">
+              <img v-if="formObj.imgUrl" width="198" height="110" :src="formObj.imgUrl">
               <file-upload
                 class="upload-img-btn"
                 :post-action="uploadBtn.postAction"
@@ -158,7 +158,7 @@ import FileUpload from 'vue-upload-component'
                 },
                 formObj: {
                     title: '',
-                    imgUrl: '',
+                    imgPath: '',
                     url: '',
                     type: 1,
                     content: '',
@@ -169,6 +169,7 @@ import FileUpload from 'vue-upload-component'
                     offType: 0,
                     offReceiveTime: '',
                     sendToApp: 1,
+                    imgUrl: ''
                 },
                 headerArray: [
                 {
@@ -184,7 +185,6 @@ import FileUpload from 'vue-upload-component'
                 }
 
                 ],
-                imgUrl: '',
                 uploadBtn: {
                     accept: 'image/jpg,image/jpeg,image/png',
                     size: 1024 * 1024 * 10,
@@ -268,9 +268,15 @@ import FileUpload from 'vue-upload-component'
                     return;
                 }
 
-
                this.formObj.publishTime = new Date(this.formObj.publishTime).getTime();
                this.formObj.offTime = new Date(this.formObj.offTime).getTime();
+
+                if(this.formObj.offType == 1 && this.formObj.offTime < new Date().getTime()){
+                     this.$message.error({message: '下线时间不能早于当前时间!' });
+                      return;
+                }
+
+
                const url = this.isEdit ? '/api/notice/update' : '/api/notice/insert';
                this.$http.post(url,{obj:JSON.stringify(this.formObj)})
                .then( res => {
@@ -323,8 +329,9 @@ import FileUpload from 'vue-upload-component'
           fileUpload (res) {
 
               if(res.filePath){
-                  this.formObj.imgUrl = res.filePath;
-                  this.imgUrl = res.path;
+                  this.formObj.imgPath = res.filePath;
+                  //全路径
+                  this.formObj.imgUrl = res.path;
               }else{
                  this.$message.error({message: '图片上传失败!' });
               }

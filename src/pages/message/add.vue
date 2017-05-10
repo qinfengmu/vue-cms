@@ -1,6 +1,6 @@
 <template>
 
-      <add-form class="w700" :isForm="true" v-on:formSubmit="save">
+      <add-form class="w705" :isForm="true" v-on:formSubmit="save">
 
         <div slot="formBody" class="form-body">
 
@@ -137,9 +137,14 @@ import addForm from '../../components/addForm'
                   if(this.formObj.publishType == 1 && (this.formObj.publishTime == '' || this.formObj.publishReceiveTime == '')){
                       this.$message.error({message: '请输入推送时间和接收时间！'});
                       return;
+                  } else {
+                      this.formObj.publishTime = new Date(this.formObj.publishTime).getTime();
                   }
 
-                  this.formObj.publishTime = new Date(this.formObj.publishTime).getTime();
+                  if(this.formObj.publishTime != '' && this.formObj.publishTime < new Date().getTime()){
+                      this.$message.error({message: '下线时间不能早于当前时间!' });
+                      return;
+                  }
 
                  this.$http.post('/api/appMessage/insert',{obj:JSON.stringify(this.formObj)})
                  .then( res => {

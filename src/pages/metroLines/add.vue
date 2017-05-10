@@ -147,7 +147,7 @@
                     </dd>
                   </dl>
                 </div>
-                <div class="right" v-if="imgSrc" style="margin-left: 30px">
+                <div class="right" v-if="imgSrc" style="margin:10px  0 0 30px">
                   <img width="360" height="200" :src="imgSrc">
                 </div>
               </div>

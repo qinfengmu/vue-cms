@@ -1,5 +1,5 @@
 <template>
-      <add-form  class="w700" :isForm="true" v-on:formSubmit="save">
+      <add-form  class="w705" :isForm="true" v-on:formSubmit="save">
 
         <div slot="formBody" class="form-body">
 

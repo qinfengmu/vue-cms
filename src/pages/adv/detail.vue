@@ -1,6 +1,6 @@
 <template>
 
-    <add-form class="w700">
+    <add-form class="w705">
       <div slot="detail">
         <dl>
           <dt>商户名称：</dt>
@@ -65,7 +65,7 @@ import addForm from '../../components/addForm'
         methods: {
 
           getDetail () {
-             this.$http.get('/advertisement/view',{params:{id: this.$route.params.id}})
+             this.$http.get('/api/advertisement/view',{params:{id: this.$route.params.id}})
              .then( (res) =>{
                 const msg = res.body;
                 if(msg.success){

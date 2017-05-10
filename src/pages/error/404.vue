@@ -1,7 +1,7 @@
 <template>
     <div>
 
-        <div>没有找到该页面</div>
+        <div class="text-center">{{msg}} <a href="/">返回</a></div>
 
     </div>
 </template>
@@ -13,7 +13,7 @@
     export default{
         data(){
             return{
-                msg:'hello vue'
+                msg:'访问的页面不存在！'
             }
         },
         components:{

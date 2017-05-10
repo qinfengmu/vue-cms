@@ -5,8 +5,8 @@ export default {
 
   state : {
 
-    text: ''
-
+    text: '',
+    showLoading: true
   },
   getters: {
     getText (state){ return state.text}
@@ -14,11 +14,17 @@ export default {
   mutations: {
     setText (state, text)  {
       state.text = text;
+    },
+    setShowLoading (state, text) {
+      state.showLoading = text
     }
   },
   actions: {
     setLoadingText ({commit},text){
       commit('setText',text);
+    },
+    setShowLoading ({commit},text) {
+      commit('setShowLoading',text);
     }
   }
 

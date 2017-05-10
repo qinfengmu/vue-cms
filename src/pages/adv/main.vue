@@ -116,7 +116,7 @@ import pagination from '../../components/pagination'
 
          const searchObj = obj || {};
          page = page || 1;
-         this.$http.get('/advertisement/getLists',{params:{pageNum: page, pageSize: this.pageSize, obj: JSON.stringify(searchObj)}})
+         this.$http.get('/api/advertisement/getLists',{params:{pageNum: page, pageSize: this.pageSize, obj: JSON.stringify(searchObj)}})
            .then( (res) =>{
               const msg = res.body;
               if(msg.result.success){

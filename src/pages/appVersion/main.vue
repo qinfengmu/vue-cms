@@ -19,8 +19,6 @@
               <dt>更新简介:</dt>
               <dd><input  v-model="searchObj.updateSynopsis" class="f-input"/></dd>
             </dl>
-
-
             <dl>
               <dt>上传人:</dt>
               <dd><input  v-model="searchObj.opUserName" class="f-input"/></dd>
@@ -44,14 +42,15 @@
               <tr v-for="data in tableData">
                 <td>{{data.versionName}}</td>
                 <td>{{data.versionCode}}</td>
+                <td>{{data.isForceUpgrade == 1 ? '是' : '否'}}</td>
                 <td>{{data.apkSynopsis}}</td>
                 <td>{{data.updateSynopsis}}</td>
                 <td>{{data.opUserName}}</td>
                 <td>{{data.opTime | date('YYYY-MM-DD HH:mm:ss')}}</td>
-                <!--<td><router-link class="blue-fontIcon" title="查看详情" :to="{ name: 'appVersionDetail', params: { id: data.id }}"><i class="iconfont icon-info"></i></router-link></td>-->
+                <td><router-link class="blue-fontIcon" title="查看详情" :to="{ name: 'appVersionDetail', params: { id: data.id }}"><i class="iconfont icon-info"></i></router-link></td>
               </tr>
               <tr v-if="tableData == ''" class="text-center">
-                  <td colspan="7">无数据</td>
+                  <td colspan="9">无数据</td>
               </tr>
             </tbody>
 
@@ -93,12 +92,14 @@ import pagination from '../../components/pagination'
                 opTime: ''
               },
               headerArray: [
-              {name: '版本名称',width:'20%'},
-              {name: '版本Code',width:'20%'},
-              {name: 'APK简介', width:'20%'},
-              {name: '更新简介'},
-              {name: '上传人'},
-              {name: '上传时间'}
+                {name: '版本名称',width:'15%'},
+                {name: '版本Code',width:'10%'},
+                {name: '是否强制更新',width:'10%'},
+                {name: 'APK简介', width:'20%'},
+                {name: '更新简介', width:'20%'},
+                {name: '上传人'},
+                {name: '上传时间'},
+                {name: '操作'}
              ],
              tableTotalPage:0,
              pageSize: 10,

@@ -39,6 +39,11 @@
     padding-top: 5px;
     margin-bottom: 20px;
     border-bottom: 1px solid #e4e4e4;
+    dl {
+      dd {
+        padding-left:0;
+      }
+    }
   }
 </style>
 <script>

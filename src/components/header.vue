@@ -28,7 +28,7 @@
     width: 100%;
     background: @headerBgColor;
     overflow: auto;
-    z-index: 9999;
+    z-index: 1000;
   }
   .header-logo{
       float: left;
@@ -82,10 +82,15 @@
           this.user = this.$store.state.User
         },
         methods: {
-            ...mapActions(['logout']),
+            ...mapActions(['logout','setLoadingText','setElements']),
             signOut () {
-               this.logout();
-               this.$router.replace('/login');
+               this.setLoadingText('正在注销...');
+               this.$http.post('/api/login/logout')
+               .then(res => {
+                    this.logout();
+                    this.$router.replace('/login');
+                    this.setElements([]);
+               })
             }
         }
     }

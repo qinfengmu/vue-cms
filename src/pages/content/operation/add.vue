@@ -1,5 +1,5 @@
 <template>
-    <add-form class="w700" :isForm="true" v-on:formSubmit="save">
+    <add-form class="w705" :isForm="true" v-on:formSubmit="save">
 
       <div slot="formBody" class="form-body">
         <dl class="dl2">
@@ -10,7 +10,7 @@
           <dt>封面图片：</dt>
           <dd>
             <div class="upload-area">
-              <img v-if="formObj.imgUrl" width="198" height="110" :src="imgUrl">
+              <img v-if="formObj.imgPath" width="198" height="110" :src="imgUrl">
               <file-upload
                 class="upload-img-btn"
                 :post-action="uploadBtn.postAction"
@@ -36,6 +36,17 @@
         <dl class="dl2">
           <dt>作者：</dt>
           <dd><input v-model="formObj.author" class="ipt ipt-large" type="text"/></dd>
+        </dl>
+        <dl class="dl2">
+          <dt>显示状态：</dt>
+          <dd>
+            <ul class="radio-list">
+              <li><input type="radio" v-model="formObj.state" value="true"
+                         id="statePicked1"><label for="statePicked1">可见</label></li>
+              <li><input type="radio" v-model="formObj.state" value="false" id="statePicked2"><label
+                for="statePicked2">不可见</label></li>
+            </ul>
+          </dd>
         </dl>
         <dl class="dl2">
           <dt><input value="0" v-model="formObj.type" @change="setContentType" type="radio" id="urlRd"><label
@@ -89,7 +100,6 @@
 </style>
 <script>
 import addForm from '../../../components/addForm'
-import uiTable from '../../../components/uiTable'
 import uEditor from '../../../components/ueditor'
 import patterns from '../../../util/patterns'
 import FileUpload from 'vue-upload-component'
@@ -97,16 +107,11 @@ import FileUpload from 'vue-upload-component'
     export default{
         data(){
             return{
-                  editorValue: '',
-                  editor: null,
-                  config: {
-                    initialFrameWidth: null,
-                    initialFrameHeight: 320
-                  },
-                pickerOptions: {
-                  disabledDate(time) {
-                    return time.getTime() < new Date().getTime() - 8.64e7 ;
-                  }
+                editorValue: '',
+                editor: null,
+                config: {
+                  initialFrameWidth: null,
+                  initialFrameHeight: 320
                 },
                 formObj: {
                     title: '',
@@ -115,23 +120,9 @@ import FileUpload from 'vue-upload-component'
                     type: 1,
                     content: '',
                     author: '',
-                    sourceInfo: ''
-
+                    sourceInfo: '',
+                    state: true
                 },
-                headerArray: [
-                {
-                  name: '发布状态'
-                },
-                {
-                  name: '发布时间',
-                  width: '40%'
-                },
-                {
-                  name: '下线时间',
-                  width: '40%'
-                }
-
-                ],
                 imgUrl: '',
                 uploadBtn: {
                     accept: 'image/jpg,image/jpeg,image/png',
@@ -156,7 +147,7 @@ import FileUpload from 'vue-upload-component'
                           progress(file, component) {
                           },
                           after(file, component) {
-                            this.$emit('fileUpload',file.response);
+                            this.$emit('fileUpload',file);
                           },
                           before(file, component) {
                           }
@@ -167,16 +158,19 @@ import FileUpload from 'vue-upload-component'
         components:{
 
           addForm,
-          uiTable,
           FileUpload,
           uEditor
 
         },
         computed: {
-
+            isEdit () {
+                return this.$route.name == 'editOperation';
+            }
         },
         created (){
-
+            if(this.isEdit){
+              this.getView();
+            }
         },
         methods: {
           save () {
@@ -202,7 +196,7 @@ import FileUpload from 'vue-upload-component'
                 }
 
 
-               const url =  '/api/serviceDynamic/insert';
+               const url = this.isEdit ? '/api/serviceDynamic/update' : '/api/serviceDynamic/insert';
                this.$http.post(url,{obj:JSON.stringify(this.formObj)})
                .then( res => {
                    const msg = res.body
@@ -230,11 +224,10 @@ import FileUpload from 'vue-upload-component'
              }
           },
 
-          fileUpload (res) {
-
-              if(res.filePath){
-                  this.formObj.imgPath = res.filePath;
-                  this.imgUrl = res.path;
+          fileUpload (file) {
+              if(file.success){
+                  this.formObj.imgPath = file.response.filePath;
+                  this.imgUrl = file.response.path;
               }else{
                  this.$message.error({message: '图片上传失败!' });
               }
@@ -244,6 +237,22 @@ import FileUpload from 'vue-upload-component'
           },
           editorReady (editor) {
               this.editor = editor;
+          },
+          getView () {
+               this.$http.get('/api/serviceDynamic/view',{params:{id: this.$route.params.id}})
+               .then( (res) =>{
+                  const msg = res.body;
+                  if(msg.success){
+                      this.formObj = msg.result;
+                      this.editorValue = msg.result.content;
+                      this.imgUrl = msg.result.imgUrl;
+                  }else{
+                      this.$message.error({message: '内容不存在或已经被删除！'});
+                  }
+
+               }, res => {
+                  this.$message.error({message: res.statusText });
+               })
           }
 
         }

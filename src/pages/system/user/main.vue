@@ -123,7 +123,7 @@ import pagination from '../../../components/pagination'
               this.$message.error({message: res.statusText });
            })
         },
-         //删除公告
+         //删除用户
         deleted (data) {
            this.$messageBox.confirm('确定要删除这个用户？','提示',{
                     confirmButtonText: '确定',

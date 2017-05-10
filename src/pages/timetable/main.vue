@@ -4,7 +4,7 @@
         <search-bar>
           <form @submit.prevent="">
             <dl>
-              <dt>版本号:</dt>
+              <dt>版本名称:</dt>
               <dd><input class="f-input" v-model="searchObj.version"/></dd>
             </dl>            <dl>
               <dt>上传人:</dt>
@@ -77,7 +77,7 @@ import pagination from '../../components/pagination'
                 opTime: ''
               },
               headerArray: [
-              {name: '版本号',width:'25%'},
+              {name: '版本名称',width:'25%'},
               {name: '版本描述', width:'25%'},
               {name: '上传人'},
               {name: '上传时间' ,width:'20%'},

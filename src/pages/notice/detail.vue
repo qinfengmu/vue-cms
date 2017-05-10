@@ -1,6 +1,6 @@
 <template>
 
-    <add-form class="w700">
+    <add-form class="w705">
       <ui-table slot="other" class="mb10" :headerArray="headerArray">
         <tbody slot="tbody">
         <tr>

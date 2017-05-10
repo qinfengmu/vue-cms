@@ -81,11 +81,11 @@ import pagination from '../../components/pagination'
                 phone: ''
               },
               headerArray: [
-              {name: '系统',width:'20%'},
-              {name: '系统版本', width:'20%'},
+              {name: '系统',width:'10%'},
+              {name: '系统版本', width:'10%'},
               {name: '型号'},
               {name: '名称'},
-              {name: '设备ID'},
+              {name: '设备ID', width: '38%'},
               {name: '手机号'}
              ],
              tableTotalPage:0,

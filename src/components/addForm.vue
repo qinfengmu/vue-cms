@@ -72,7 +72,7 @@
       }
     }
     .ipt-large {
-      width: 550px;
+      width: 565px;
     }
     .ipt-medium {
       width: 180px;

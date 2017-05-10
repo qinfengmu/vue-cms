@@ -1,9 +1,9 @@
 <template>
 
-    <add-form class="w700">
+    <add-form class="w705">
       <div slot="detail">
         <dl>
-          <dt>版本号：</dt>
+          <dt>版本名称：</dt>
           <dd class="default">{{data.name}}</dd>
         </dl>
         <dl>
